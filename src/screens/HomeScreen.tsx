@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
+  Image,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
@@ -23,19 +24,19 @@ export function HomeScreen({ navigation }: Props) {
   const nextPractice = mockPractices[0];
   const nextLive = mockLiveEvents.find((e) => e.status === 'scheduled');
 
-  const [todayTasks, setTodayTasks] = useState([
-    { id: '1', text: '青春コンプレックス', checked: false },
-    { id: '2', text: 'スタジオ予約確認', checked: false },
-    { id: '3', text: 'セットリスト最終確認', checked: true },
-  ]);
+  // const [todayTasks, setTodayTasks] = useState([
+  //   { id: '1', text: '青春コンプレックス', checked: false },
+  //   { id: '2', text: 'スタジオ予約確認', checked: false },
+  //   { id: '3', text: 'セットリスト最終確認', checked: true },
+  // ]);
 
-  const toggleTask = (id: string) => {
-    setTodayTasks((prev) =>
-      prev.map((task) =>
-        task.id === id ? { ...task, checked: !task.checked } : task
-      )
-    );
-  };
+  // const toggleTask = (id: string) => {
+  //   setTodayTasks((prev) =>
+  //     prev.map((task) =>
+  //       task.id === id ? { ...task, checked: !task.checked } : task
+  //     )
+  //   );
+  // };
 
   return (
     <SafeAreaView style={styles.container} >
@@ -49,6 +50,13 @@ export function HomeScreen({ navigation }: Props) {
           <Text style={styles.avatarText}>
             {bandInfo.memberName.charAt(0)}
           </Text>
+        </View>
+        <View pointerEvents="none" style={styles.headerIconWrapper}>
+          <Image
+            source={require("../../assets/icons/logoBlack.png")}
+            style={styles.headerIcon}
+            resizeMode="contain"
+          />
         </View>
       </View>
 
@@ -152,7 +160,7 @@ export function HomeScreen({ navigation }: Props) {
         )}
 
         {/* Today's Tasks */}
-        <Card style={styles.card}>
+        {/* <Card style={styles.card}>
           <View style={styles.taskHeader}>
             <Feather name="check-square" size={20} color={colors.primary} />
             <Text style={styles.taskTitle}>今日のやること</Text>
@@ -180,7 +188,7 @@ export function HomeScreen({ navigation }: Props) {
               </Text>
             </TouchableOpacity>
           ))}
-        </Card>
+        </Card> */}
 
         {/* Quick Actions */}
         <Text style={styles.sectionTitle}>クイックアクション</Text>
@@ -235,6 +243,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
     backgroundColor: colors.card,
+    position: 'relative',
+  },
+  headerIconWrapper: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  headerIcon: {
+    width: 100,
+    height: 100,
   },
   bandName: {
     fontSize: 18,
