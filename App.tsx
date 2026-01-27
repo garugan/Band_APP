@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { PracticeProvider } from './src/contexts/PracticeContext';
 import { LiveProvider } from './src/contexts/LiveContext';
+import { SongProvider } from './src/contexts/SongContext';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 
 function AppContent() {
@@ -46,11 +47,13 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <PracticeProvider>
-          <LiveProvider>
-            <AppContent />
-          </LiveProvider>
-        </PracticeProvider>
+        <SongProvider>
+          <PracticeProvider>
+            <LiveProvider>
+              <AppContent />
+            </LiveProvider>
+          </PracticeProvider>
+        </SongProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );

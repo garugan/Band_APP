@@ -13,6 +13,7 @@ import { LogDetailScreen } from '../screens/LogDetailScreen';
 import { LogAddScreen } from '../screens/LogAddScreen';
 import { PracticeAddScreen } from '../screens/PracticeAddScreen';
 import { LiveAddScreen } from '../screens/LiveAddScreen';
+import { SongAddScreen } from '../screens/SongAddScreen';
 import { PlaceholderScreen } from '../screens/PlaceholderScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -47,7 +48,7 @@ export function AppNavigator() {
       />
       <Stack.Screen
         name="SongAdd"
-        component={PlaceholderScreen}
+        component={SongAddScreen}
         options={{ title: '曲を追加' }}
       />
       <Stack.Screen

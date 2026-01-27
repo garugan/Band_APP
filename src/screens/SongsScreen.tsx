@@ -15,7 +15,7 @@ import { Chip } from '../components/Chip';
 import { FAB } from '../components/FAB';
 import { EmptyState } from '../components/EmptyState';
 import { useThemeColors } from '../contexts/ThemeContext';
-import { mockSongs } from '../data/mockData';
+import { useSongs } from '../contexts/SongContext';
 import { Song } from '../data/types';
 import { MainTabScreenProps } from '../navigation/types';
 
@@ -23,9 +23,10 @@ type Props = MainTabScreenProps<'Songs'>;
 
 export function SongsScreen({ navigation }: Props) {
   const colors = useThemeColors();
+  const { songs } = useSongs();
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredSongs = mockSongs.filter((song) =>
+  const filteredSongs = songs.filter((song) =>
     song.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 

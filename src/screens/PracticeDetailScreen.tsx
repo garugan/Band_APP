@@ -1,10 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useLayoutEffect, useMemo } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
+  TextInput,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { format } from 'date-fns';
@@ -22,12 +24,93 @@ type Props = RootStackScreenProps<'PracticeDetail'>;
 export function PracticeDetailScreen({ route, navigation }: Props) {
   const colors = useThemeColors();
   const { id } = route.params;
-  const { practices } = usePractices();
+  const { practices, updatePractice, deletePractice } = usePractices();
   const practice = practices.find((p) => p.id === id);
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [editLocation, setEditLocation] = useState(practice?.location || '');
+  const [editMeetTime, setEditMeetTime] = useState(practice?.meetTime || '');
+  const [editPurpose, setEditPurpose] = useState(practice?.purpose || '');
+  const [editMemo, setEditMemo] = useState(practice?.memo || '');
   const [checklist, setChecklist] = useState<ChecklistItem[]>(
     practice?.checklist || []
   );
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          {isEditing ? (
+            <>
+              <TouchableOpacity onPress={handleCancelEdit} style={{ padding: 8 }}>
+                <Text style={{ color: colors.textSecondary, fontSize: 16 }}>キャンセル</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleSaveEdit} style={{ padding: 8 }}>
+                <Text style={{ color: colors.primary, fontSize: 16, fontWeight: '600' as const }}>保存</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <TouchableOpacity onPress={() => startEditing()} style={{ padding: 8 }}>
+                <Feather name="edit-2" size={20} color={colors.primary} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleDelete} style={{ padding: 8 }}>
+                <Feather name="trash-2" size={20} color={colors.error} />
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      ),
+    });
+  }, [navigation, isEditing, editLocation, editMeetTime, editPurpose, editMemo, checklist, colors]);
+
+  const startEditing = () => {
+    if (!practice) return;
+    setEditLocation(practice.location);
+    setEditMeetTime(practice.meetTime || '');
+    setEditPurpose(practice.purpose);
+    setEditMemo(practice.memo);
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+  };
+
+  const handleSaveEdit = () => {
+    if (!practice) return;
+    if (!editLocation.trim()) {
+      Alert.alert('エラー', '場所を入力してください');
+      return;
+    }
+    if (!editPurpose.trim()) {
+      Alert.alert('エラー', '目的を入力してください');
+      return;
+    }
+    updatePractice(id, {
+      ...practice,
+      location: editLocation.trim(),
+      meetTime: editMeetTime.trim() || undefined,
+      purpose: editPurpose.trim(),
+      memo: editMemo.trim(),
+      checklist,
+    });
+    setIsEditing(false);
+  };
+
+  const handleDelete = () => {
+    Alert.alert('削除確認', 'この練習を削除しますか？', [
+      { text: 'キャンセル', style: 'cancel' },
+      {
+        text: '削除',
+        style: 'destructive',
+        onPress: () => {
+          deletePractice(id);
+          navigation.goBack();
+        },
+      },
+    ]);
+  };
 
   const styles = useMemo(() => StyleSheet.create({
     container: {
@@ -182,6 +265,26 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
       color: colors.text,
       lineHeight: 22,
     },
+    editLabel: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      color: colors.textSecondary,
+      marginBottom: 4,
+      marginTop: 12,
+    },
+    editInput: {
+      fontSize: 16,
+      color: colors.text,
+      paddingVertical: 8,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    editTextarea: {
+      fontSize: 15,
+      color: colors.text,
+      minHeight: 80,
+      padding: 0,
+    },
     actionButton: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -222,31 +325,72 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Basic Info */}
       <Card style={styles.card}>
-        <View style={styles.infoRow}>
-          <Feather name="calendar" size={18} color={colors.primary} />
-          <Text style={styles.infoText}>
-            {format(practice.date, 'yyyy年M月d日(E) HH:mm', { locale: ja })}
-          </Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Feather name="map-pin" size={18} color={colors.primary} />
-          <Text style={styles.infoText}>{practice.location}</Text>
-        </View>
-        {practice.meetTime && (
-          <View style={styles.infoRow}>
-            <Feather name="clock" size={18} color={colors.primary} />
-            <Text style={styles.infoText}>集合: {practice.meetTime}</Text>
-          </View>
+        {isEditing ? (
+          <>
+            <Text style={[styles.editLabel, { marginTop: 0 }]}>場所</Text>
+            <TextInput
+              style={styles.editInput}
+              value={editLocation}
+              onChangeText={setEditLocation}
+              placeholder="場所"
+              placeholderTextColor={colors.textMuted}
+            />
+            <Text style={styles.editLabel}>集合時間（任意）</Text>
+            <TextInput
+              style={styles.editInput}
+              value={editMeetTime}
+              onChangeText={setEditMeetTime}
+              placeholder="例: 16:30"
+              placeholderTextColor={colors.textMuted}
+            />
+          </>
+        ) : (
+          <>
+            <View style={styles.infoRow}>
+              <Feather name="calendar" size={18} color={colors.primary} />
+              <Text style={styles.infoText}>
+                {format(practice.date, 'yyyy年M月d日(E) HH:mm', { locale: ja })}
+              </Text>
+            </View>
+            <View style={styles.infoRow}>
+              <Feather name="map-pin" size={18} color={colors.primary} />
+              <Text style={styles.infoText}>{practice.location}</Text>
+            </View>
+            {practice.meetTime && (
+              <View style={styles.infoRow}>
+                <Feather name="clock" size={18} color={colors.primary} />
+                <Text style={styles.infoText}>集合: {practice.meetTime}</Text>
+              </View>
+            )}
+          </>
         )}
       </Card>
 
       {/* Purpose */}
       <Card style={styles.card}>
-        <View style={styles.sectionHeader}>
-          <Feather name="target" size={18} color={colors.primary} />
-          <Text style={styles.sectionTitle}>目的</Text>
-        </View>
-        <Text style={styles.purposeText}>{practice.purpose}</Text>
+        {isEditing ? (
+          <>
+            <Text style={[styles.editLabel, { marginTop: 0 }]}>目的</Text>
+            <TextInput
+              style={styles.editTextarea}
+              value={editPurpose}
+              onChangeText={setEditPurpose}
+              placeholder="練習の目的"
+              placeholderTextColor={colors.textMuted}
+              multiline
+              numberOfLines={3}
+              textAlignVertical="top"
+            />
+          </>
+        ) : (
+          <>
+            <View style={styles.sectionHeader}>
+              <Feather name="target" size={18} color={colors.primary} />
+              <Text style={styles.sectionTitle}>目的</Text>
+            </View>
+            <Text style={styles.purposeText}>{practice.purpose}</Text>
+          </>
+        )}
       </Card>
 
       {/* Songs */}
@@ -333,12 +477,26 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
       )}
 
       {/* Memo */}
-      {practice.memo && (
+      {isEditing ? (
+        <Card style={styles.card}>
+          <Text style={[styles.editLabel, { marginTop: 0 }]}>メモ</Text>
+          <TextInput
+            style={styles.editTextarea}
+            value={editMemo}
+            onChangeText={setEditMemo}
+            placeholder="メモ（任意）"
+            placeholderTextColor={colors.textMuted}
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+          />
+        </Card>
+      ) : practice.memo ? (
         <Card style={styles.card}>
           <Text style={styles.memoLabel}>メモ</Text>
           <Text style={styles.memoText}>{practice.memo}</Text>
         </Card>
-      )}
+      ) : null}
 
       {/* Action Button */}
       <TouchableOpacity
