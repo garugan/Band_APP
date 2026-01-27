@@ -1,7 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from './types';
-import { colors } from '../theme/colors';
+import { useThemeColors } from '../contexts/ThemeContext';
 
 import { TabNavigator } from './TabNavigator';
 import { SongDetailScreen } from '../screens/SongDetailScreen';
@@ -18,6 +18,8 @@ import { PlaceholderScreen } from '../screens/PlaceholderScreen';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function AppNavigator() {
+  const colors = useThemeColors();
+
   return (
     <Stack.Navigator
       screenOptions={{

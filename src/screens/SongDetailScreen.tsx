@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -11,15 +11,117 @@ import { Feather } from '@expo/vector-icons';
 
 import { Card } from '../components/Card';
 import { Chip } from '../components/Chip';
-import { colors } from '../theme/colors';
+import { useThemeColors } from '../contexts/ThemeContext';
 import { mockSongs, mockPracticeLogs, getSongById } from '../data/mockData';
 import { RootStackScreenProps } from '../navigation/types';
 
 type Props = RootStackScreenProps<'SongDetail'>;
 
 export function SongDetailScreen({ route, navigation }: Props) {
+  const colors = useThemeColors();
   const { id } = route.params;
   const song = mockSongs.find((s) => s.id === id);
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      padding: 16,
+    },
+    errorText: {
+      fontSize: 16,
+      color: colors.error,
+      textAlign: 'center',
+      marginTop: 40,
+    },
+    card: {
+      marginBottom: 12,
+    },
+    songTitle: {
+      fontSize: 24,
+      fontWeight: '700' as const,
+      color: colors.text,
+      marginBottom: 16,
+    },
+    metaGrid: {
+      flexDirection: 'row',
+      gap: 24,
+    },
+    metaItem: {
+      alignItems: 'center',
+    },
+    metaLabel: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginBottom: 4,
+    },
+    metaValue: {
+      fontSize: 20,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    sectionTitle: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      color: colors.textSecondary,
+      marginBottom: 12,
+    },
+    tagsContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    memoText: {
+      fontSize: 15,
+      color: colors.text,
+      lineHeight: 22,
+    },
+    linkRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    linkText: {
+      flex: 1,
+      fontSize: 16,
+      color: colors.primary,
+      marginLeft: 12,
+    },
+    section: {
+      marginTop: 8,
+    },
+    sectionHeader: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+      marginBottom: 12,
+    },
+    logCard: {
+      marginBottom: 8,
+    },
+    logRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    logDate: {
+      fontSize: 14,
+      color: colors.text,
+    },
+    achievementBadge: {
+      backgroundColor: colors.primaryLight,
+      paddingHorizontal: 12,
+      paddingVertical: 4,
+      borderRadius: 12,
+    },
+    achievementText: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      color: colors.primary,
+    },
+    bottomSpacer: {
+      height: 40,
+    },
+  }), [colors]);
 
   if (!song) {
     return (
@@ -128,104 +230,3 @@ export function SongDetailScreen({ route, navigation }: Props) {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    padding: 16,
-  },
-  errorText: {
-    fontSize: 16,
-    color: colors.error,
-    textAlign: 'center',
-    marginTop: 40,
-  },
-  card: {
-    marginBottom: 12,
-  },
-  songTitle: {
-    fontSize: 24,
-    fontWeight: '700' as const,
-    color: colors.text,
-    marginBottom: 16,
-  },
-  metaGrid: {
-    flexDirection: 'row',
-    gap: 24,
-  },
-  metaItem: {
-    alignItems: 'center',
-  },
-  metaLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginBottom: 4,
-  },
-  metaValue: {
-    fontSize: 20,
-    fontWeight: '600' as const,
-    color: colors.text,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: colors.textSecondary,
-    marginBottom: 12,
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  memoText: {
-    fontSize: 15,
-    color: colors.text,
-    lineHeight: 22,
-  },
-  linkRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  linkText: {
-    flex: 1,
-    fontSize: 16,
-    color: colors.primary,
-    marginLeft: 12,
-  },
-  section: {
-    marginTop: 8,
-  },
-  sectionHeader: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.text,
-    marginBottom: 12,
-  },
-  logCard: {
-    marginBottom: 8,
-  },
-  logRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  logDate: {
-    fontSize: 14,
-    color: colors.text,
-  },
-  achievementBadge: {
-    backgroundColor: colors.primaryLight,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  achievementText: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: colors.primary,
-  },
-  bottomSpacer: {
-    height: 40,
-  },
-});

@@ -1,19 +1,113 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
 import { Card } from '../components/Card';
-import { colors } from '../theme/colors';
+import { useThemeColors } from '../contexts/ThemeContext';
 import { mockPracticeLogs, getSongById } from '../data/mockData';
 import { RootStackScreenProps } from '../navigation/types';
 
 type Props = RootStackScreenProps<'LogDetail'>;
 
 export function LogDetailScreen({ route }: Props) {
+  const colors = useThemeColors();
   const { id } = route.params;
   const log = mockPracticeLogs.find((l) => l.id === id);
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      padding: 16,
+    },
+    errorText: {
+      fontSize: 16,
+      color: colors.error,
+      textAlign: 'center',
+      marginTop: 40,
+    },
+    card: {
+      marginBottom: 12,
+    },
+    dateRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    dateText: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+      marginLeft: 12,
+    },
+    section: {
+      marginBottom: 12,
+    },
+    sectionLabel: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+      marginBottom: 12,
+    },
+    songCard: {
+      marginBottom: 8,
+    },
+    songHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    songTitle: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    achievementText: {
+      fontSize: 18,
+      fontWeight: '700' as const,
+      color: colors.primary,
+    },
+    progressBar: {
+      height: 8,
+      backgroundColor: colors.muted,
+      borderRadius: 4,
+      overflow: 'hidden',
+      marginBottom: 8,
+    },
+    progressFill: {
+      height: '100%',
+      backgroundColor: colors.primary,
+      borderRadius: 4,
+    },
+    songMeta: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    sectionTitle: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      marginLeft: 8,
+    },
+    contentText: {
+      fontSize: 15,
+      color: colors.text,
+      lineHeight: 24,
+    },
+    issuesCard: {
+      borderLeftWidth: 3,
+      borderLeftColor: colors.error,
+    },
+    bottomSpacer: {
+      height: 40,
+    },
+  }), [colors]);
 
   if (!log) {
     return (
@@ -105,96 +199,3 @@ export function LogDetailScreen({ route }: Props) {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    padding: 16,
-  },
-  errorText: {
-    fontSize: 16,
-    color: colors.error,
-    textAlign: 'center',
-    marginTop: 40,
-  },
-  card: {
-    marginBottom: 12,
-  },
-  dateRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  dateText: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.text,
-    marginLeft: 12,
-  },
-  section: {
-    marginBottom: 12,
-  },
-  sectionLabel: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.text,
-    marginBottom: 12,
-  },
-  songCard: {
-    marginBottom: 8,
-  },
-  songHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  songTitle: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.text,
-  },
-  achievementText: {
-    fontSize: 18,
-    fontWeight: '700' as const,
-    color: colors.primary,
-  },
-  progressBar: {
-    height: 8,
-    backgroundColor: colors.muted,
-    borderRadius: 4,
-    overflow: 'hidden',
-    marginBottom: 8,
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: colors.primary,
-    borderRadius: 4,
-  },
-  songMeta: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    marginLeft: 8,
-  },
-  contentText: {
-    fontSize: 15,
-    color: colors.text,
-    lineHeight: 24,
-  },
-  issuesCard: {
-    borderLeftWidth: 3,
-    borderLeftColor: colors.error,
-  },
-  bottomSpacer: {
-    height: 40,
-  },
-});

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
 import { Card } from '../components/Card';
-import { colors } from '../theme/colors';
+import { useThemeColors } from '../contexts/ThemeContext';
 import { getSongById } from '../data/mockData';
 import { RootStackScreenProps } from '../navigation/types';
 import { ChecklistItem } from '../data/types';
@@ -20,6 +20,7 @@ import { usePractices } from '../contexts/PracticeContext';
 type Props = RootStackScreenProps<'PracticeDetail'>;
 
 export function PracticeDetailScreen({ route, navigation }: Props) {
+  const colors = useThemeColors();
   const { id } = route.params;
   const { practices } = usePractices();
   const practice = practices.find((p) => p.id === id);
@@ -27,6 +28,179 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
   const [checklist, setChecklist] = useState<ChecklistItem[]>(
     practice?.checklist || []
   );
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      padding: 16,
+    },
+    errorText: {
+      fontSize: 16,
+      color: colors.error,
+      textAlign: 'center',
+      marginTop: 40,
+    },
+    card: {
+      marginBottom: 12,
+    },
+    infoRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    infoText: {
+      fontSize: 15,
+      color: colors.text,
+      marginLeft: 12,
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    sectionTitle: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      color: colors.textSecondary,
+      marginLeft: 8,
+    },
+    purposeText: {
+      fontSize: 16,
+      color: colors.text,
+      lineHeight: 24,
+    },
+    section: {
+      marginBottom: 12,
+    },
+    sectionLabel: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+      marginBottom: 12,
+    },
+    sectionHeaderRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    editLink: {
+      fontSize: 14,
+      color: colors.primary,
+      fontWeight: '500' as const,
+    },
+    songCard: {
+      marginBottom: 8,
+    },
+    songHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    orderBadge: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      backgroundColor: colors.primaryLight,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    orderText: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      color: colors.primary,
+    },
+    songInfo: {
+      flex: 1,
+      marginLeft: 12,
+    },
+    songTitle: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    songMeta: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    goalContainer: {
+      flexDirection: 'row',
+      marginTop: 12,
+      paddingTop: 12,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    goalLabel: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      marginRight: 8,
+    },
+    goalText: {
+      fontSize: 13,
+      color: colors.text,
+      flex: 1,
+    },
+    checklistRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    checkbox: {
+      width: 22,
+      height: 22,
+      borderRadius: 4,
+      borderWidth: 2,
+      borderColor: colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 12,
+    },
+    checkboxChecked: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+    checklistText: {
+      fontSize: 14,
+      color: colors.text,
+      flex: 1,
+    },
+    checklistTextChecked: {
+      textDecorationLine: 'line-through',
+      color: colors.textMuted,
+    },
+    memoLabel: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      color: colors.textSecondary,
+      marginBottom: 8,
+    },
+    memoText: {
+      fontSize: 15,
+      color: colors.text,
+      lineHeight: 22,
+    },
+    actionButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.primary,
+      paddingVertical: 14,
+      borderRadius: 12,
+      gap: 8,
+      marginTop: 8,
+    },
+    actionButtonText: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: '#ffffff',
+    },
+    bottomSpacer: {
+      height: 40,
+    },
+  }), [colors]);
 
   if (!practice) {
     return (
@@ -183,176 +357,3 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    padding: 16,
-  },
-  errorText: {
-    fontSize: 16,
-    color: colors.error,
-    textAlign: 'center',
-    marginTop: 40,
-  },
-  card: {
-    marginBottom: 12,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  infoText: {
-    fontSize: 15,
-    color: colors.text,
-    marginLeft: 12,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: colors.textSecondary,
-    marginLeft: 8,
-  },
-  purposeText: {
-    fontSize: 16,
-    color: colors.text,
-    lineHeight: 24,
-  },
-  section: {
-    marginBottom: 12,
-  },
-  sectionLabel: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.text,
-    marginBottom: 12,
-  },
-  sectionHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  editLink: {
-    fontSize: 14,
-    color: colors.primary,
-    fontWeight: '500' as const,
-  },
-  songCard: {
-    marginBottom: 8,
-  },
-  songHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  orderBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  orderText: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: colors.primary,
-  },
-  songInfo: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  songTitle: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.text,
-  },
-  songMeta: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  goalContainer: {
-    flexDirection: 'row',
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  goalLabel: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginRight: 8,
-  },
-  goalText: {
-    fontSize: 13,
-    color: colors.text,
-    flex: 1,
-  },
-  checklistRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  checkbox: {
-    width: 22,
-    height: 22,
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  checkboxChecked: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  checklistText: {
-    fontSize: 14,
-    color: colors.text,
-    flex: 1,
-  },
-  checklistTextChecked: {
-    textDecorationLine: 'line-through',
-    color: colors.textMuted,
-  },
-  memoLabel: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: colors.textSecondary,
-    marginBottom: 8,
-  },
-  memoText: {
-    fontSize: 15,
-    color: colors.text,
-    lineHeight: 22,
-  },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 12,
-    gap: 8,
-    marginTop: 8,
-  },
-  actionButtonText: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#ffffff',
-  },
-  bottomSpacer: {
-    height: 40,
-  },
-});

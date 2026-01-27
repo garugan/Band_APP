@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import { Card } from '../components/Card';
 import { Chip } from '../components/Chip';
 import { FAB } from '../components/FAB';
 import { EmptyState } from '../components/EmptyState';
-import { colors } from '../theme/colors';
+import { useThemeColors } from '../contexts/ThemeContext';
 import { mockSongs } from '../data/mockData';
 import { Song } from '../data/types';
 import { MainTabScreenProps } from '../navigation/types';
@@ -22,11 +22,93 @@ import { MainTabScreenProps } from '../navigation/types';
 type Props = MainTabScreenProps<'Songs'>;
 
 export function SongsScreen({ navigation }: Props) {
+  const colors = useThemeColors();
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredSongs = mockSongs.filter((song) =>
     song.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      backgroundColor: colors.card,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: '700' as const,
+      color: colors.text,
+    },
+    filterButton: {
+      padding: 8,
+    },
+    searchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      margin: 16,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      backgroundColor: colors.muted,
+      borderRadius: 10,
+    },
+    searchInput: {
+      flex: 1,
+      fontSize: 16,
+      color: colors.text,
+      marginLeft: 8,
+      paddingVertical: 0,
+    },
+    listContent: {
+      padding: 16,
+      paddingTop: 0,
+      paddingBottom: 100,
+    },
+    songCard: {
+      marginBottom: 12,
+    },
+    songHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+    },
+    songTitle: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+      flex: 1,
+    },
+    songMeta: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    metaText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+    tagsContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 6,
+      marginTop: 10,
+    },
+    memo: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginTop: 10,
+      lineHeight: 20,
+    },
+  }), [colors]);
 
   const renderSong = ({ item }: { item: Song }) => (
     <TouchableOpacity
@@ -119,84 +201,3 @@ export function SongsScreen({ navigation }: Props) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    backgroundColor: colors.card,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700' as const,
-    color: colors.text,
-  },
-  filterButton: {
-    padding: 8,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    margin: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: colors.muted,
-    borderRadius: 10,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: colors.text,
-    marginLeft: 8,
-    paddingVertical: 0,
-  },
-  listContent: {
-    padding: 16,
-    paddingTop: 0,
-    paddingBottom: 100,
-  },
-  songCard: {
-    marginBottom: 12,
-  },
-  songHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  songTitle: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.text,
-    flex: 1,
-  },
-  songMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  metaText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-    marginTop: 10,
-  },
-  memo: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginTop: 10,
-    lineHeight: 20,
-  },
-});

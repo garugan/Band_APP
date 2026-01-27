@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
 import { Feather } from '@expo/vector-icons';
 
 import { Card } from '../components/Card';
-import { colors } from '../theme/colors';
+import { useThemeColors } from '../contexts/ThemeContext';
 import { getSongById } from '../data/mockData';
 import { SetlistSong } from '../data/types';
 import { RootStackScreenProps } from '../navigation/types';
@@ -20,6 +20,7 @@ import { useLiveEvents } from '../contexts/LiveContext';
 type Props = RootStackScreenProps<'SetlistEdit'>;
 
 export function SetlistEditScreen({ route, navigation }: Props) {
+  const colors = useThemeColors();
   const { id } = route.params;
   const { liveEvents, updateLiveEvent } = useLiveEvents();
   const liveEvent = liveEvents.find((e) => e.id === id);
@@ -27,6 +28,131 @@ export function SetlistEditScreen({ route, navigation }: Props) {
   const [setlist, setSetlist] = useState<SetlistSong[]>(
     liveEvent?.setlist || []
   );
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      flex: 1,
+      padding: 16,
+    },
+    errorText: {
+      fontSize: 16,
+      color: colors.error,
+      textAlign: 'center',
+      marginTop: 40,
+    },
+    songCard: {
+      marginBottom: 12,
+    },
+    songHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    dragHandle: {
+      padding: 4,
+      marginRight: 8,
+    },
+    orderBadge: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      backgroundColor: colors.primaryLight,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    orderText: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      color: colors.primary,
+    },
+    songInfo: {
+      flex: 1,
+      marginLeft: 12,
+    },
+    songTitle: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    songMeta: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    actions: {
+      flexDirection: 'row',
+      gap: 4,
+    },
+    actionButton: {
+      padding: 6,
+    },
+    actionButtonDisabled: {
+      opacity: 0.5,
+    },
+    memoInput: {
+      marginTop: 12,
+      paddingTop: 12,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      fontSize: 14,
+      color: colors.text,
+    },
+    addButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 16,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      borderStyle: 'dashed',
+      borderRadius: 12,
+      gap: 8,
+    },
+    addButtonText: {
+      fontSize: 16,
+      color: colors.primary,
+      fontWeight: '500' as const,
+    },
+    bottomSpacer: {
+      height: 100,
+    },
+    footer: {
+      flexDirection: 'row',
+      padding: 16,
+      gap: 12,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      backgroundColor: colors.card,
+    },
+    cancelButton: {
+      flex: 1,
+      paddingVertical: 14,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: 'center',
+    },
+    cancelButtonText: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.textSecondary,
+    },
+    saveButton: {
+      flex: 1,
+      paddingVertical: 14,
+      borderRadius: 12,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+    },
+    saveButtonText: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: '#ffffff',
+    },
+  }), [colors]);
 
   if (!liveEvent) {
     return (
@@ -43,7 +169,6 @@ export function SetlistEditScreen({ route, navigation }: Props) {
       newSetlist[index],
       newSetlist[index - 1],
     ];
-    // Update order numbers
     newSetlist.forEach((song, i) => {
       song.order = i + 1;
     });
@@ -57,7 +182,6 @@ export function SetlistEditScreen({ route, navigation }: Props) {
       newSetlist[index + 1],
       newSetlist[index],
     ];
-    // Update order numbers
     newSetlist.forEach((song, i) => {
       song.order = i + 1;
     });
@@ -96,7 +220,6 @@ export function SetlistEditScreen({ route, navigation }: Props) {
   };
 
   const handleAddSong = () => {
-    // TODO: Open song selection modal
     Alert.alert('曲を追加', 'この機能は開発中です');
   };
 
@@ -195,128 +318,3 @@ export function SetlistEditScreen({ route, navigation }: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    flex: 1,
-    padding: 16,
-  },
-  errorText: {
-    fontSize: 16,
-    color: colors.error,
-    textAlign: 'center',
-    marginTop: 40,
-  },
-  songCard: {
-    marginBottom: 12,
-  },
-  songHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  dragHandle: {
-    padding: 4,
-    marginRight: 8,
-  },
-  orderBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  orderText: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: colors.primary,
-  },
-  songInfo: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  songTitle: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.text,
-  },
-  songMeta: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: 4,
-  },
-  actionButton: {
-    padding: 6,
-  },
-  actionButtonDisabled: {
-    opacity: 0.5,
-  },
-  memoInput: {
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    fontSize: 14,
-    color: colors.text,
-  },
-  addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderStyle: 'dashed',
-    borderRadius: 12,
-    gap: 8,
-  },
-  addButtonText: {
-    fontSize: 16,
-    color: colors.primary,
-    fontWeight: '500' as const,
-  },
-  bottomSpacer: {
-    height: 100,
-  },
-  footer: {
-    flexDirection: 'row',
-    padding: 16,
-    gap: 12,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    backgroundColor: colors.card,
-  },
-  cancelButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.textSecondary,
-  },
-  saveButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 12,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-  },
-  saveButtonText: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#ffffff',
-  },
-});

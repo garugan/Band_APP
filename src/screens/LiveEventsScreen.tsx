@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import { ja } from 'date-fns/locale';
 import { Card } from '../components/Card';
 import { FAB } from '../components/FAB';
 import { EmptyState } from '../components/EmptyState';
-import { colors } from '../theme/colors';
+import { useThemeColors } from '../contexts/ThemeContext';
 import { LiveEvent } from '../data/types';
 import { MainTabScreenProps } from '../navigation/types';
 import { useLiveEvents } from '../contexts/LiveContext';
@@ -24,6 +24,7 @@ type Props = MainTabScreenProps<'Live'>;
 type FilterType = 'all' | 'scheduled' | 'completed';
 
 export function LiveEventsScreen({ navigation }: Props) {
+  const colors = useThemeColors();
   const { liveEvents } = useLiveEvents();
   const [filter, setFilter] = useState<FilterType>('all');
 
@@ -33,6 +34,100 @@ export function LiveEventsScreen({ navigation }: Props) {
       return event.status === filter;
     })
     .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      backgroundColor: colors.card,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: '700' as const,
+      color: colors.text,
+    },
+    filterContainer: {
+      flexDirection: 'row',
+      padding: 16,
+      gap: 8,
+    },
+    filterButton: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 20,
+      backgroundColor: colors.muted,
+    },
+    filterButtonActive: {
+      backgroundColor: colors.primary,
+    },
+    filterText: {
+      fontSize: 14,
+      fontWeight: '500' as const,
+      color: colors.textSecondary,
+    },
+    filterTextActive: {
+      color: '#ffffff',
+    },
+    listContent: {
+      padding: 16,
+      paddingTop: 0,
+      paddingBottom: 100,
+    },
+    eventCard: {
+      marginBottom: 12,
+    },
+    eventHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    eventTitle: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+      flex: 1,
+    },
+    statusBadge: {
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 12,
+    },
+    statusScheduled: {
+      backgroundColor: colors.primaryLight,
+    },
+    statusCompleted: {
+      backgroundColor: colors.successLight,
+    },
+    statusText: {
+      fontSize: 12,
+      fontWeight: '600' as const,
+    },
+    statusTextScheduled: {
+      color: colors.primary,
+    },
+    statusTextCompleted: {
+      color: colors.success,
+    },
+    eventInfo: {
+      gap: 6,
+    },
+    infoRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    infoText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginLeft: 8,
+    },
+  }), [colors]);
 
   const renderEvent = ({ item }: { item: LiveEvent }) => (
     <TouchableOpacity
@@ -136,97 +231,3 @@ export function LiveEventsScreen({ navigation }: Props) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    backgroundColor: colors.card,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700' as const,
-    color: colors.text,
-  },
-  filterContainer: {
-    flexDirection: 'row',
-    padding: 16,
-    gap: 8,
-  },
-  filterButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: colors.muted,
-  },
-  filterButtonActive: {
-    backgroundColor: colors.primary,
-  },
-  filterText: {
-    fontSize: 14,
-    fontWeight: '500' as const,
-    color: colors.textSecondary,
-  },
-  filterTextActive: {
-    color: '#ffffff',
-  },
-  listContent: {
-    padding: 16,
-    paddingTop: 0,
-    paddingBottom: 100,
-  },
-  eventCard: {
-    marginBottom: 12,
-  },
-  eventHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  eventTitle: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.text,
-    flex: 1,
-  },
-  statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusScheduled: {
-    backgroundColor: colors.primaryLight,
-  },
-  statusCompleted: {
-    backgroundColor: colors.successLight,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600' as const,
-  },
-  statusTextScheduled: {
-    color: colors.primary,
-  },
-  statusTextCompleted: {
-    color: colors.success,
-  },
-  eventInfo: {
-    gap: 6,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  infoText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginLeft: 8,
-  },
-});

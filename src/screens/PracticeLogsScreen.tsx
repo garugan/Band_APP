@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,7 @@ import { Card } from '../components/Card';
 import { Chip } from '../components/Chip';
 import { FAB } from '../components/FAB';
 import { EmptyState } from '../components/EmptyState';
-import { colors } from '../theme/colors';
+import { useThemeColors } from '../contexts/ThemeContext';
 import { mockPracticeLogs, getSongById } from '../data/mockData';
 import { PracticeLog } from '../data/types';
 import { MainTabScreenProps } from '../navigation/types';
@@ -25,6 +25,7 @@ type Props = MainTabScreenProps<'Log'>;
 type FilterType = 'this-month' | 'last-month' | 'all';
 
 export function PracticeLogsScreen({ navigation }: Props) {
+  const colors = useThemeColors();
   const [filter, setFilter] = useState<FilterType>('this-month');
 
   const calculateAverageAchievement = (log: PracticeLog): number => {
@@ -43,6 +44,130 @@ export function PracticeLogsScreen({ navigation }: Props) {
           ) / totalPractices
         )
       : 0;
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      backgroundColor: colors.card,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: '700' as const,
+      color: colors.text,
+    },
+    summaryCard: {
+      margin: 16,
+      marginBottom: 0,
+    },
+    summaryRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    summaryItem: {
+      flex: 1,
+      alignItems: 'center',
+    },
+    summaryValue: {
+      fontSize: 28,
+      fontWeight: '700' as const,
+      color: colors.primary,
+    },
+    summaryLabel: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginTop: 4,
+    },
+    summaryDivider: {
+      width: 1,
+      height: 40,
+      backgroundColor: colors.border,
+    },
+    filterContainer: {
+      flexDirection: 'row',
+      padding: 16,
+      gap: 8,
+    },
+    filterButton: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 20,
+      backgroundColor: colors.muted,
+    },
+    filterButtonActive: {
+      backgroundColor: colors.primary,
+    },
+    filterText: {
+      fontSize: 14,
+      fontWeight: '500' as const,
+      color: colors.textSecondary,
+    },
+    filterTextActive: {
+      color: '#ffffff',
+    },
+    listContent: {
+      padding: 16,
+      paddingTop: 0,
+      paddingBottom: 100,
+    },
+    logCard: {
+      marginBottom: 12,
+    },
+    logHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: 12,
+    },
+    logDate: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    logTime: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    achievementBadge: {
+      backgroundColor: colors.primaryLight,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 16,
+    },
+    achievementText: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      color: colors.primary,
+    },
+    songsContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    songsCount: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginLeft: 6,
+    },
+    tagsContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 6,
+      marginBottom: 8,
+    },
+    issuesText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+  }), [colors]);
 
   const renderLog = ({ item }: { item: PracticeLog }) => {
     const avgAchievement = calculateAverageAchievement(item);
@@ -165,127 +290,3 @@ export function PracticeLogsScreen({ navigation }: Props) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    backgroundColor: colors.card,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700' as const,
-    color: colors.text,
-  },
-  summaryCard: {
-    margin: 16,
-    marginBottom: 0,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  summaryItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  summaryValue: {
-    fontSize: 28,
-    fontWeight: '700' as const,
-    color: colors.primary,
-  },
-  summaryLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 4,
-  },
-  summaryDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: colors.border,
-  },
-  filterContainer: {
-    flexDirection: 'row',
-    padding: 16,
-    gap: 8,
-  },
-  filterButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: colors.muted,
-  },
-  filterButtonActive: {
-    backgroundColor: colors.primary,
-  },
-  filterText: {
-    fontSize: 14,
-    fontWeight: '500' as const,
-    color: colors.textSecondary,
-  },
-  filterTextActive: {
-    color: '#ffffff',
-  },
-  listContent: {
-    padding: 16,
-    paddingTop: 0,
-    paddingBottom: 100,
-  },
-  logCard: {
-    marginBottom: 12,
-  },
-  logHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 12,
-  },
-  logDate: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.text,
-  },
-  logTime: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  achievementBadge: {
-    backgroundColor: colors.primaryLight,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  achievementText: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: colors.primary,
-  },
-  songsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  songsCount: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginLeft: 6,
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-    marginBottom: 8,
-  },
-  issuesText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    lineHeight: 20,
-  },
-});

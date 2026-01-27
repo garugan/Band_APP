@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,7 @@ import { format, parse } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
 import { Card } from '../components/Card';
-import { colors } from '../theme/colors';
+import { useThemeColors } from '../contexts/ThemeContext';
 import { mockSongs, mockChecklistTemplates } from '../data/mockData';
 import { RootStackScreenProps } from '../navigation/types';
 import { usePractices } from '../contexts/PracticeContext';
@@ -29,6 +29,7 @@ interface PracticeSongItem {
 }
 
 export function PracticeAddScreen({ route, navigation }: Props) {
+  const colors = useThemeColors();
   const { addPractice } = usePractices();
 
   const initialDate = route.params?.date
@@ -129,6 +130,203 @@ export function PracticeAddScreen({ route, navigation }: Props) {
       { text: 'OK', onPress: () => navigation.goBack() },
     ]);
   };
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      flex: 1,
+      padding: 16,
+    },
+    card: {
+      marginBottom: 12,
+    },
+    label: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      color: colors.text,
+      marginBottom: 8,
+    },
+    dateButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      paddingVertical: 8,
+    },
+    dateText: {
+      fontSize: 16,
+      color: colors.text,
+    },
+    doneButton: {
+      alignSelf: 'flex-end',
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+    },
+    doneButtonText: {
+      fontSize: 16,
+      color: colors.primary,
+      fontWeight: '600' as const,
+    },
+    input: {
+      fontSize: 16,
+      color: colors.text,
+      paddingVertical: 8,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    section: {
+      marginBottom: 12,
+    },
+    sectionLabel: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+      marginBottom: 12,
+    },
+    emptyCard: {
+      alignItems: 'center',
+      paddingVertical: 32,
+      gap: 12,
+    },
+    emptyText: {
+      fontSize: 14,
+      color: colors.textMuted,
+    },
+    songCard: {
+      marginBottom: 8,
+    },
+    songHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    orderBadge: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      backgroundColor: colors.primaryLight,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    orderText: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      color: colors.primary,
+    },
+    songTitle: {
+      flex: 1,
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    goalInput: {
+      marginTop: 12,
+      paddingTop: 12,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      fontSize: 14,
+      color: colors.text,
+    },
+    addButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 16,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      borderStyle: 'dashed',
+      borderRadius: 12,
+      gap: 8,
+    },
+    addButtonText: {
+      fontSize: 16,
+      color: colors.primary,
+      fontWeight: '500' as const,
+    },
+    checkboxRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    checkbox: {
+      width: 22,
+      height: 22,
+      borderRadius: 4,
+      borderWidth: 2,
+      borderColor: colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 12,
+    },
+    checkboxChecked: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+    checkboxLabel: {
+      fontSize: 14,
+      color: colors.text,
+    },
+    templatePreview: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginTop: 12,
+      paddingTop: 12,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    templateName: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+    templateCount: {
+      fontSize: 12,
+      color: colors.textMuted,
+    },
+    textarea: {
+      fontSize: 15,
+      color: colors.text,
+      minHeight: 80,
+      padding: 0,
+    },
+    bottomSpacer: {
+      height: 100,
+    },
+    footer: {
+      flexDirection: 'row',
+      padding: 16,
+      gap: 12,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      backgroundColor: colors.card,
+    },
+    cancelButton: {
+      flex: 1,
+      paddingVertical: 14,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: 'center',
+    },
+    cancelButtonText: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.textSecondary,
+    },
+    saveButton: {
+      flex: 1,
+      paddingVertical: 14,
+      borderRadius: 12,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+    },
+    saveButtonText: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: '#ffffff',
+    },
+  }), [colors]);
 
   return (
     <View style={styles.container}>
@@ -327,200 +525,3 @@ export function PracticeAddScreen({ route, navigation }: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    flex: 1,
-    padding: 16,
-  },
-  card: {
-    marginBottom: 12,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: colors.text,
-    marginBottom: 8,
-  },
-  dateButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 8,
-  },
-  dateText: {
-    fontSize: 16,
-    color: colors.text,
-  },
-  doneButton: {
-    alignSelf: 'flex-end',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-  },
-  doneButtonText: {
-    fontSize: 16,
-    color: colors.primary,
-    fontWeight: '600' as const,
-  },
-  input: {
-    fontSize: 16,
-    color: colors.text,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  section: {
-    marginBottom: 12,
-  },
-  sectionLabel: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.text,
-    marginBottom: 12,
-  },
-  emptyCard: {
-    alignItems: 'center',
-    paddingVertical: 32,
-    gap: 12,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: colors.textMuted,
-  },
-  songCard: {
-    marginBottom: 8,
-  },
-  songHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  orderBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  orderText: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: colors.primary,
-  },
-  songTitle: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.text,
-  },
-  goalInput: {
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    fontSize: 14,
-    color: colors.text,
-  },
-  addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderStyle: 'dashed',
-    borderRadius: 12,
-    gap: 8,
-  },
-  addButtonText: {
-    fontSize: 16,
-    color: colors.primary,
-    fontWeight: '500' as const,
-  },
-  checkboxRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  checkbox: {
-    width: 22,
-    height: 22,
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  checkboxChecked: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  checkboxLabel: {
-    fontSize: 14,
-    color: colors.text,
-  },
-  templatePreview: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  templateName: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  templateCount: {
-    fontSize: 12,
-    color: colors.textMuted,
-  },
-  textarea: {
-    fontSize: 15,
-    color: colors.text,
-    minHeight: 80,
-    padding: 0,
-  },
-  bottomSpacer: {
-    height: 100,
-  },
-  footer: {
-    flexDirection: 'row',
-    padding: 16,
-    gap: 12,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    backgroundColor: colors.card,
-  },
-  cancelButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.textSecondary,
-  },
-  saveButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 12,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-  },
-  saveButtonText: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#ffffff',
-  },
-});

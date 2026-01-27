@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import { useThemeColors } from '../contexts/ThemeContext';
 
 interface ChipProps {
   label: string;
@@ -10,7 +10,37 @@ interface ChipProps {
 }
 
 export function Chip({ label, variant = 'default', onRemove }: ChipProps) {
+  const colors = useThemeColors();
   const isPrimary = variant === 'primary';
+
+  const styles = useMemo(() => StyleSheet.create({
+    chip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 16,
+    },
+    chipDefault: {
+      backgroundColor: colors.muted,
+    },
+    chipPrimary: {
+      backgroundColor: colors.primaryLight,
+    },
+    label: {
+      fontSize: 12,
+      fontWeight: '500' as const,
+    },
+    labelDefault: {
+      color: colors.textSecondary,
+    },
+    labelPrimary: {
+      color: colors.primary,
+    },
+    removeButton: {
+      marginLeft: 4,
+    },
+  }), [colors]);
 
   return (
     <View
@@ -39,32 +69,3 @@ export function Chip({ label, variant = 'default', onRemove }: ChipProps) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  chip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 16,
-  },
-  chipDefault: {
-    backgroundColor: colors.muted,
-  },
-  chipPrimary: {
-    backgroundColor: colors.primaryLight,
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: '500' as const,
-  },
-  labelDefault: {
-    color: colors.textSecondary,
-  },
-  labelPrimary: {
-    color: colors.primary,
-  },
-  removeButton: {
-    marginLeft: 4,
-  },
-});

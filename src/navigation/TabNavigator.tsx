@@ -2,7 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Feather } from '@expo/vector-icons';
 import { MainTabParamList } from './types';
-import { colors } from '../theme/colors';
+import { useThemeColors } from '../contexts/ThemeContext';
 
 import { HomeScreen } from '../screens/HomeScreen';
 import { SongsScreen } from '../screens/SongsScreen';
@@ -13,6 +13,8 @@ import { PracticeLogsScreen } from '../screens/PracticeLogsScreen';
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export function TabNavigator() {
+  const colors = useThemeColors();
+
   return (
     <Tab.Navigator
       screenOptions={{

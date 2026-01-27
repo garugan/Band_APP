@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import { useThemeColors } from '../contexts/ThemeContext';
 
 interface EmptyStateProps {
   icon: string;
@@ -18,6 +18,40 @@ export function EmptyState({
   actionLabel,
   onAction,
 }: EmptyStateProps) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 48,
+      paddingHorizontal: 16,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: '600' as const,
+      color: colors.text,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    description: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
+    button: {
+      marginTop: 16,
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      backgroundColor: colors.primary,
+      borderRadius: 8,
+    },
+    buttonText: {
+      color: '#ffffff',
+      fontSize: 14,
+      fontWeight: '600' as const,
+    },
+  }), [colors]);
+
   return (
     <View style={styles.container}>
       <Feather name={icon as any} size={48} color={colors.textMuted} />
@@ -31,36 +65,3 @@ export function EmptyState({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 48,
-    paddingHorizontal: 16,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600' as const,
-    color: colors.text,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  description: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-  button: {
-    marginTop: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '600' as const,
-  },
-});

@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import { useThemeColors } from '../contexts/ThemeContext';
 
 interface IconButtonProps {
   icon: string;
@@ -15,16 +15,18 @@ export function IconButton({
   icon,
   onPress,
   size = 24,
-  color = colors.text,
+  color,
   style,
 }: IconButtonProps) {
+  const colors = useThemeColors();
+
   return (
     <TouchableOpacity
       style={[styles.button, style]}
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <Feather name={icon as any} size={size} color={color} />
+      <Feather name={icon as any} size={size} color={color ?? colors.text} />
     </TouchableOpacity>
   );
 }

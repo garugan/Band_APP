@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -25,7 +25,7 @@ import { ja } from 'date-fns/locale';
 
 import { Card } from '../components/Card';
 import { FAB } from '../components/FAB';
-import { colors } from '../theme/colors';
+import { useThemeColors } from '../contexts/ThemeContext';
 import { MainTabScreenProps } from '../navigation/types';
 import { usePractices } from '../contexts/PracticeContext';
 
@@ -34,6 +34,7 @@ type Props = MainTabScreenProps<'Schedule'>;
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
 
 export function ScheduleScreen({ navigation }: Props) {
+  const colors = useThemeColors();
   const { practices } = usePractices();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -72,6 +73,207 @@ export function ScheduleScreen({ navigation }: Props) {
   const upcomingPractices = practices
     .filter((p) => p.date >= new Date())
     .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      backgroundColor: colors.card,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: '700' as const,
+      color: colors.text,
+    },
+    calendarCard: {
+      margin: 16,
+      padding: 12,
+    },
+    monthNav: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    navButton: {
+      padding: 8,
+    },
+    monthTitle: {
+      fontSize: 18,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    weekdayRow: {
+      flexDirection: 'row',
+      marginBottom: 8,
+    },
+    weekdayCell: {
+      flex: 1,
+      alignItems: 'center',
+      paddingVertical: 8,
+    },
+    weekdayText: {
+      fontSize: 12,
+      fontWeight: '500' as const,
+      color: colors.textSecondary,
+    },
+    sundayText: {
+      color: colors.error,
+    },
+    saturdayText: {
+      color: colors.primary,
+    },
+    calendarGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+    },
+    dayCell: {
+      width: '14.28%',
+      aspectRatio: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 2,
+    },
+    dayContent: {
+      width: 36,
+      height: 36,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 18,
+    },
+    todayContent: {
+      backgroundColor: colors.primary,
+    },
+    practiceContent: {
+      backgroundColor: colors.primaryLight,
+    },
+    selectedContent: {
+      borderWidth: 2,
+      borderColor: colors.primary,
+    },
+    dayText: {
+      fontSize: 14,
+      color: colors.text,
+    },
+    otherMonthText: {
+      color: colors.textMuted,
+    },
+    todayText: {
+      color: '#ffffff',
+      fontWeight: '700' as const,
+    },
+    practiceText: {
+      color: colors.primary,
+      fontWeight: '600' as const,
+    },
+    selectedText: {
+      color: colors.primary,
+      fontWeight: '700' as const,
+    },
+    selectedDateSection: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginHorizontal: 16,
+      marginBottom: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      backgroundColor: colors.primaryLight,
+      borderRadius: 8,
+    },
+    selectedDateText: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      color: colors.primary,
+    },
+    clearSelection: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+    practiceSection: {
+      padding: 16,
+      paddingTop: 0,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+      marginBottom: 12,
+    },
+    practiceCard: {
+      marginBottom: 12,
+    },
+    practiceHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    dateBox: {
+      width: 60,
+      alignItems: 'center',
+      paddingRight: 12,
+      borderRightWidth: 1,
+      borderRightColor: colors.border,
+    },
+    dateMonth: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+    dateDay: {
+      fontSize: 24,
+      fontWeight: '700' as const,
+      color: colors.primary,
+    },
+    dateDow: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+    practiceInfo: {
+      flex: 1,
+      paddingLeft: 12,
+    },
+    practiceTime: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    practiceLocation: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    practicePurpose: {
+      fontSize: 12,
+      color: colors.textMuted,
+      marginTop: 4,
+    },
+    songCount: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 6,
+    },
+    songCountText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginLeft: 4,
+    },
+    emptyCard: {
+      alignItems: 'center',
+      paddingVertical: 24,
+    },
+    emptyText: {
+      fontSize: 14,
+      color: colors.textMuted,
+    },
+    bottomSpacer: {
+      height: 100,
+    },
+  }), [colors]);
 
   return (
     <SafeAreaView style={styles.container} >
@@ -244,204 +446,3 @@ export function ScheduleScreen({ navigation }: Props) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    backgroundColor: colors.card,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700' as const,
-    color: colors.text,
-  },
-  calendarCard: {
-    margin: 16,
-    padding: 12,
-  },
-  monthNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  navButton: {
-    padding: 8,
-  },
-  monthTitle: {
-    fontSize: 18,
-    fontWeight: '600' as const,
-    color: colors.text,
-  },
-  weekdayRow: {
-    flexDirection: 'row',
-    marginBottom: 8,
-  },
-  weekdayCell: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  weekdayText: {
-    fontSize: 12,
-    fontWeight: '500' as const,
-    color: colors.textSecondary,
-  },
-  sundayText: {
-    color: colors.error,
-  },
-  saturdayText: {
-    color: colors.primary,
-  },
-  calendarGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  dayCell: {
-    width: '14.28%',
-    aspectRatio: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 2,
-  },
-  dayContent: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 18,
-  },
-  todayContent: {
-    backgroundColor: colors.primary,
-  },
-  practiceContent: {
-    backgroundColor: colors.primaryLight,
-  },
-  selectedContent: {
-    borderWidth: 2,
-    borderColor: colors.primary,
-  },
-  dayText: {
-    fontSize: 14,
-    color: colors.text,
-  },
-  otherMonthText: {
-    color: colors.textMuted,
-  },
-  todayText: {
-    color: '#ffffff',
-    fontWeight: '700' as const,
-  },
-  practiceText: {
-    color: colors.primary,
-    fontWeight: '600' as const,
-  },
-  selectedText: {
-    color: colors.primary,
-    fontWeight: '700' as const,
-  },
-  selectedDateSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginHorizontal: 16,
-    marginBottom: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: colors.primaryLight,
-    borderRadius: 8,
-  },
-  selectedDateText: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: colors.primary,
-  },
-  clearSelection: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  practiceSection: {
-    padding: 16,
-    paddingTop: 0,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.text,
-    marginBottom: 12,
-  },
-  practiceCard: {
-    marginBottom: 12,
-  },
-  practiceHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  dateBox: {
-    width: 60,
-    alignItems: 'center',
-    paddingRight: 12,
-    borderRightWidth: 1,
-    borderRightColor: colors.border,
-  },
-  dateMonth: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  dateDay: {
-    fontSize: 24,
-    fontWeight: '700' as const,
-    color: colors.primary,
-  },
-  dateDow: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  practiceInfo: {
-    flex: 1,
-    paddingLeft: 12,
-  },
-  practiceTime: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: colors.text,
-  },
-  practiceLocation: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  practicePurpose: {
-    fontSize: 12,
-    color: colors.textMuted,
-    marginTop: 4,
-  },
-  songCount: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 6,
-  },
-  songCountText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginLeft: 4,
-  },
-  emptyCard: {
-    alignItems: 'center',
-    paddingVertical: 24,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: colors.textMuted,
-  },
-  bottomSpacer: {
-    height: 100,
-  },
-});

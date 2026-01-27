@@ -1,11 +1,37 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 
 import { Card } from '../components/Card';
-import { colors } from '../theme/colors';
+import { useThemeColors } from '../contexts/ThemeContext';
 
 export function PlaceholderScreen() {
+  const colors = useThemeColors();
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      padding: 16,
+      justifyContent: 'center',
+    },
+    card: {
+      alignItems: 'center',
+      paddingVertical: 48,
+      gap: 16,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    description: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
+  }), [colors]);
+
   return (
     <View style={styles.container}>
       <Card style={styles.card}>
@@ -19,28 +45,3 @@ export function PlaceholderScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    padding: 16,
-    justifyContent: 'center',
-  },
-  card: {
-    alignItems: 'center',
-    paddingVertical: 48,
-    gap: 16,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '600' as const,
-    color: colors.text,
-  },
-  description: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-});

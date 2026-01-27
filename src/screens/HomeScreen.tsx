@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,37 +14,174 @@ import { ja } from 'date-fns/locale';
 
 import { Card } from '../components/Card';
 import { FAB } from '../components/FAB';
-import { colors } from '../theme/colors';
-import { bandInfo, mockPractices, mockLiveEvents } from '../data/mockData';
+import { useTheme } from '../contexts/ThemeContext';
+import { bandInfo } from '../data/mockData';
 import { MainTabScreenProps } from '../navigation/types';
+import { usePractices } from '../contexts/PracticeContext';
+import { useLiveEvents } from '../contexts/LiveContext';
 
 type Props = MainTabScreenProps<'Home'>;
 
 export function HomeScreen({ navigation }: Props) {
-  const nextPractice = mockPractices[0];
-  const nextLive = mockLiveEvents.find((e) => e.status === 'scheduled');
+  const { practices } = usePractices();
+  const { liveEvents } = useLiveEvents();
+  const { isDark, toggleTheme, colors } = useTheme();
 
-  // const [todayTasks, setTodayTasks] = useState([
-  //   { id: '1', text: '青春コンプレックス', checked: false },
-  //   { id: '2', text: 'スタジオ予約確認', checked: false },
-  //   { id: '3', text: 'セットリスト最終確認', checked: true },
-  // ]);
+  const now = new Date();
 
-  // const toggleTask = (id: string) => {
-  //   setTodayTasks((prev) =>
-  //     prev.map((task) =>
-  //       task.id === id ? { ...task, checked: !task.checked } : task
-  //     )
-  //   );
-  // };
+  const nextPractice = practices
+    .filter((p) => p.date.getTime() >= now.getTime())
+    .sort((a, b) => a.date.getTime() - b.date.getTime())[0] ?? null;
+
+  const nextLive = liveEvents
+    .filter((e) => e.status === 'scheduled' && e.date.getTime() >= now.getTime())
+    .sort((a, b) => a.date.getTime() - b.date.getTime())[0] ?? null;
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      backgroundColor: colors.card,
+      position: 'relative',
+    },
+    headerLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    themeToggle: {
+      padding: 8,
+      borderRadius: 20,
+    },
+    headerIconWrapper: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      alignItems: 'center',
+    },
+    headerIcon: {
+      width: 100,
+      height: 100,
+    },
+    bandName: {
+      fontSize: 18,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    memberName: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    avatar: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    avatarText: {
+      fontSize: 18,
+      fontWeight: '600' as const,
+      color: '#ffffff',
+    },
+    content: {
+      flex: 1,
+      padding: 16,
+    },
+    card: {
+      marginBottom: 12,
+    },
+    cardHeader: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+    },
+    iconContainer: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.primaryLight,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 12,
+    },
+    cardContent: {
+      flex: 1,
+    },
+    cardTitle: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+      marginBottom: 8,
+    },
+    infoRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 4,
+    },
+    infoText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginLeft: 8,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+      marginTop: 8,
+      marginBottom: 12,
+      paddingHorizontal: 4,
+    },
+    actionsGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 12,
+    },
+    actionButton: {
+      width: '47%',
+      backgroundColor: colors.card,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 12,
+      paddingVertical: 16,
+      alignItems: 'center',
+      gap: 8,
+    },
+    actionText: {
+      fontSize: 14,
+      color: colors.text,
+    },
+    bottomSpacer: {
+      height: 100,
+    },
+  }), [colors]);
 
   return (
     <SafeAreaView style={styles.container} >
       {/* Header */}
       <View style={styles.header}>
-        <View>
-          <Text style={styles.bandName}>{bandInfo.name}</Text>
-          <Text style={styles.memberName}>{bandInfo.memberName}</Text>
+        <View style={styles.headerLeft}>
+          <View>
+            <Text style={styles.bandName}>{bandInfo.name}</Text>
+            <Text style={styles.memberName}>{bandInfo.memberName}</Text>
+          </View>
+          <TouchableOpacity style={styles.themeToggle} onPress={toggleTheme}>
+            <Feather
+              name={isDark ? 'sun' : 'moon'}
+              size={20}
+              color={colors.text}
+            />
+          </TouchableOpacity>
         </View>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>
@@ -53,7 +190,11 @@ export function HomeScreen({ navigation }: Props) {
         </View>
         <View pointerEvents="none" style={styles.headerIconWrapper}>
           <Image
-            source={require("../../assets/icons/logoBlack.png")}
+            source={
+              isDark
+                ? require('../../assets/icons/logoWhite.png')
+                : require('../../assets/icons/logoBlack.png')
+            }
             style={styles.headerIcon}
             resizeMode="contain"
           />
@@ -159,37 +300,6 @@ export function HomeScreen({ navigation }: Props) {
           </TouchableOpacity>
         )}
 
-        {/* Today's Tasks */}
-        {/* <Card style={styles.card}>
-          <View style={styles.taskHeader}>
-            <Feather name="check-square" size={20} color={colors.primary} />
-            <Text style={styles.taskTitle}>今日のやること</Text>
-          </View>
-          {todayTasks.map((task) => (
-            <TouchableOpacity
-              key={task.id}
-              style={styles.taskRow}
-              onPress={() => toggleTask(task.id)}
-            >
-              <View
-                style={[
-                  styles.checkbox,
-                  task.checked && styles.checkboxChecked,
-                ]}
-              >
-                {task.checked && (
-                  <Feather name="check" size={14} color="#ffffff" />
-                )}
-              </View>
-              <Text
-                style={[styles.taskText, task.checked && styles.taskTextChecked]}
-              >
-                {task.text}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </Card> */}
-
         {/* Quick Actions */}
         <Text style={styles.sectionTitle}>クイックアクション</Text>
         <View style={styles.actionsGrid}>
@@ -228,162 +338,3 @@ export function HomeScreen({ navigation }: Props) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    backgroundColor: colors.card,
-    position: 'relative',
-  },
-  headerIconWrapper: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
-  headerIcon: {
-    width: 100,
-    height: 100,
-  },
-  bandName: {
-    fontSize: 18,
-    fontWeight: '600' as const,
-    color: colors.text,
-  },
-  memberName: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    fontSize: 18,
-    fontWeight: '600' as const,
-    color: '#ffffff',
-  },
-  content: {
-    flex: 1,
-    padding: 16,
-  },
-  card: {
-    marginBottom: 12,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  cardContent: {
-    flex: 1,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.text,
-    marginBottom: 8,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  infoText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginLeft: 8,
-  },
-  taskHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  taskTitle: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.text,
-    marginLeft: 8,
-  },
-  taskRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  checkbox: {
-    width: 22,
-    height: 22,
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  checkboxChecked: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  taskText: {
-    fontSize: 14,
-    color: colors.text,
-    flex: 1,
-  },
-  taskTextChecked: {
-    textDecorationLine: 'line-through',
-    color: colors.textMuted,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: colors.text,
-    marginTop: 8,
-    marginBottom: 12,
-    paddingHorizontal: 4,
-  },
-  actionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  actionButton: {
-    width: '47%',
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    gap: 8,
-  },
-  actionText: {
-    fontSize: 14,
-    color: colors.text,
-  },
-  bottomSpacer: {
-    height: 100,
-  },
-});
