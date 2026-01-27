@@ -12,15 +12,17 @@ import { ja } from 'date-fns/locale';
 
 import { Card } from '../components/Card';
 import { colors } from '../theme/colors';
-import { mockPractices, getSongById } from '../data/mockData';
+import { getSongById } from '../data/mockData';
 import { RootStackScreenProps } from '../navigation/types';
 import { ChecklistItem } from '../data/types';
+import { usePractices } from '../contexts/PracticeContext';
 
 type Props = RootStackScreenProps<'PracticeDetail'>;
 
 export function PracticeDetailScreen({ route, navigation }: Props) {
   const { id } = route.params;
-  const practice = mockPractices.find((p) => p.id === id);
+  const { practices } = usePractices();
+  const practice = practices.find((p) => p.id === id);
 
   const [checklist, setChecklist] = useState<ChecklistItem[]>(
     practice?.checklist || []
