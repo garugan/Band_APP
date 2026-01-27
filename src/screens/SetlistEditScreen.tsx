@@ -12,15 +12,17 @@ import { Feather } from '@expo/vector-icons';
 
 import { Card } from '../components/Card';
 import { colors } from '../theme/colors';
-import { mockLiveEvents, getSongById } from '../data/mockData';
+import { getSongById } from '../data/mockData';
 import { SetlistSong } from '../data/types';
 import { RootStackScreenProps } from '../navigation/types';
+import { useLiveEvents } from '../contexts/LiveContext';
 
 type Props = RootStackScreenProps<'SetlistEdit'>;
 
 export function SetlistEditScreen({ route, navigation }: Props) {
   const { id } = route.params;
-  const liveEvent = mockLiveEvents.find((e) => e.id === id);
+  const { liveEvents, updateLiveEvent } = useLiveEvents();
+  const liveEvent = liveEvents.find((e) => e.id === id);
 
   const [setlist, setSetlist] = useState<SetlistSong[]>(
     liveEvent?.setlist || []
@@ -86,7 +88,8 @@ export function SetlistEditScreen({ route, navigation }: Props) {
   };
 
   const handleSave = () => {
-    // TODO: Save to storage
+    if (!liveEvent) return;
+    updateLiveEvent(id, { ...liveEvent, setlist });
     Alert.alert('保存完了', 'セットリストを保存しました', [
       { text: 'OK', onPress: () => navigation.goBack() },
     ]);
