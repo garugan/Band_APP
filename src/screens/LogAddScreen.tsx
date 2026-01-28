@@ -18,6 +18,8 @@ import { ja } from 'date-fns/locale';
 import { Card } from '../components/Card';
 import { useThemeColors } from '../contexts/ThemeContext';
 import { useSongs } from '../contexts/SongContext';
+import { usePractices } from '../contexts/PracticeContext';
+import { useLogs } from '../contexts/LogContext';
 import { LogSong } from '../data/types';
 import { RootStackScreenProps } from '../navigation/types';
 
@@ -26,9 +28,16 @@ type Props = RootStackScreenProps<'LogAdd'>;
 export function LogAddScreen({ route, navigation }: Props) {
   const colors = useThemeColors();
   const { songs: allSongs } = useSongs();
-  const [date, setDate] = useState(new Date());
+  const { practices } = usePractices();
+  const { addLog } = useLogs();
+  const practiceId = route.params?.practiceId;
+  const practice = practiceId ? practices.find((p) => p.id === practiceId) : undefined;
+
+  const [date, setDate] = useState(practice?.date ? new Date(practice.date) : new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [songs, setSongs] = useState<LogSong[]>([]);
+  const [songs, setSongs] = useState<LogSong[]>(
+    practice?.songs.map((s) => ({ songId: s.songId, achievement: 50 })) || []
+  );
   const [goodPoints, setGoodPoints] = useState('');
   const [issues, setIssues] = useState('');
   const [nextActions, setNextActions] = useState('');
@@ -68,9 +77,17 @@ export function LogAddScreen({ route, navigation }: Props) {
       return;
     }
 
-    Alert.alert('保存完了', 'ログを保存しました', [
-      { text: 'OK', onPress: () => navigation.goBack() },
-    ]);
+    addLog({
+      id: Date.now().toString(),
+      date,
+      relatedPracticeId: practiceId,
+      songs,
+      goodPoints: goodPoints.trim(),
+      issues: issues.trim(),
+      nextActions: nextActions.trim(),
+    });
+
+    navigation.goBack();
   };
 
   const styles = useMemo(() => StyleSheet.create({

@@ -171,10 +171,10 @@ export function HomeScreen({ navigation }: Props) {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <View>
+          {/* <View>
             <Text style={styles.bandName}>{bandInfo.name}</Text>
             <Text style={styles.memberName}>{bandInfo.memberName}</Text>
-          </View>
+          </View> */}
           <TouchableOpacity style={styles.themeToggle} onPress={toggleTheme}>
             <Feather
               name={isDark ? 'sun' : 'moon'}

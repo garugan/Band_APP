@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import React, { useMemo, useLayoutEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
@@ -7,16 +7,41 @@ import { ja } from 'date-fns/locale';
 import { Card } from '../components/Card';
 import { useThemeColors } from '../contexts/ThemeContext';
 import { useSongs } from '../contexts/SongContext';
-import { mockPracticeLogs } from '../data/mockData';
+import { useLogs } from '../contexts/LogContext';
 import { RootStackScreenProps } from '../navigation/types';
 
 type Props = RootStackScreenProps<'LogDetail'>;
 
-export function LogDetailScreen({ route }: Props) {
+export function LogDetailScreen({ route, navigation }: Props) {
   const colors = useThemeColors();
   const { songs: allSongs } = useSongs();
+  const { logs, deleteLog } = useLogs();
   const { id } = route.params;
-  const log = mockPracticeLogs.find((l) => l.id === id);
+  const log = logs.find((l) => l.id === id);
+
+  const handleDelete = () => {
+    Alert.alert('削除確認', 'このログを削除しますか？', [
+      { text: 'キャンセル', style: 'cancel' },
+      {
+        text: '削除',
+        style: 'destructive',
+        onPress: () => {
+          deleteLog(id);
+          navigation.goBack();
+        },
+      },
+    ]);
+  };
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={handleDelete} style={{ padding: 8 }}>
+          <Feather name="trash-2" size={20} color={colors.error} />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, colors]);
 
   const styles = useMemo(() => StyleSheet.create({
     container: {

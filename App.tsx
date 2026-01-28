@@ -6,6 +6,7 @@ import { AppNavigator } from './src/navigation/AppNavigator';
 import { PracticeProvider } from './src/contexts/PracticeContext';
 import { LiveProvider } from './src/contexts/LiveContext';
 import { SongProvider } from './src/contexts/SongContext';
+import { LogProvider } from './src/contexts/LogContext';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 
 function AppContent() {
@@ -50,7 +51,9 @@ export default function App() {
         <SongProvider>
           <PracticeProvider>
             <LiveProvider>
-              <AppContent />
+              <LogProvider>
+                <AppContent />
+              </LogProvider>
             </LiveProvider>
           </PracticeProvider>
         </SongProvider>

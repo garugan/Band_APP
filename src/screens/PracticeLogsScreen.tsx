@@ -17,7 +17,7 @@ import { FAB } from '../components/FAB';
 import { EmptyState } from '../components/EmptyState';
 import { useThemeColors } from '../contexts/ThemeContext';
 import { useSongs } from '../contexts/SongContext';
-import { mockPracticeLogs } from '../data/mockData';
+import { useLogs } from '../contexts/LogContext';
 import { PracticeLog } from '../data/types';
 import { MainTabScreenProps } from '../navigation/types';
 
@@ -28,6 +28,7 @@ type FilterType = 'this-month' | 'last-month' | 'all';
 export function PracticeLogsScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const { songs: allSongs } = useSongs();
+  const { logs } = useLogs();
   const [filter, setFilter] = useState<FilterType>('this-month');
 
   const calculateAverageAchievement = (log: PracticeLog): number => {
@@ -36,11 +37,11 @@ export function PracticeLogsScreen({ navigation }: Props) {
     return Math.round(total / log.songs.length);
   };
 
-  const totalPractices = mockPracticeLogs.length;
+  const totalPractices = logs.length;
   const overallAverage =
     totalPractices > 0
       ? Math.round(
-          mockPracticeLogs.reduce(
+          logs.reduce(
             (sum, log) => sum + calculateAverageAchievement(log),
             0
           ) / totalPractices
@@ -270,9 +271,9 @@ export function PracticeLogsScreen({ navigation }: Props) {
       </View>
 
       {/* Log List */}
-      {mockPracticeLogs.length > 0 ? (
+      {logs.length > 0 ? (
         <FlatList
-          data={mockPracticeLogs}
+          data={logs}
           renderItem={renderLog}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}

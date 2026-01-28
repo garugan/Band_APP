@@ -657,17 +657,19 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
       ) : null}
 
       {/* Action Button */}
-      <TouchableOpacity
-        style={styles.actionButton}
-        onPress={() =>
-          navigation.navigate('LogAdd', { practiceId: practice.id })
-        }
-      >
-        <Feather name="file-text" size={20} color="#ffffff" />
-        <Text style={styles.actionButtonText}>
-          この練習からログを作成
-        </Text>
-      </TouchableOpacity>
+      {!isEditing && (
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() =>
+            navigation.navigate('LogAdd', { practiceId: practice.id })
+          }
+        >
+          <Feather name="file-text" size={20} color="#ffffff" />
+          <Text style={styles.actionButtonText}>
+            この練習からログを作成
+          </Text>
+        </TouchableOpacity>
+      )}
 
       <View style={styles.bottomSpacer} />
     </ScrollView>
