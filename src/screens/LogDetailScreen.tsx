@@ -6,13 +6,15 @@ import { ja } from 'date-fns/locale';
 
 import { Card } from '../components/Card';
 import { useThemeColors } from '../contexts/ThemeContext';
-import { mockPracticeLogs, getSongById } from '../data/mockData';
+import { useSongs } from '../contexts/SongContext';
+import { mockPracticeLogs } from '../data/mockData';
 import { RootStackScreenProps } from '../navigation/types';
 
 type Props = RootStackScreenProps<'LogDetail'>;
 
 export function LogDetailScreen({ route }: Props) {
   const colors = useThemeColors();
+  const { songs: allSongs } = useSongs();
   const { id } = route.params;
   const log = mockPracticeLogs.find((l) => l.id === id);
 
@@ -133,7 +135,7 @@ export function LogDetailScreen({ route }: Props) {
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>曲の達成度</Text>
         {log.songs.map((logSong) => {
-          const song = getSongById(logSong.songId);
+          const song = allSongs.find((s) => s.id === logSong.songId);
           return (
             <Card key={logSong.songId} style={styles.songCard}>
               <View style={styles.songHeader}>

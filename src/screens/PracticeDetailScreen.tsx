@@ -14,7 +14,7 @@ import { ja } from 'date-fns/locale';
 
 import { Card } from '../components/Card';
 import { useThemeColors } from '../contexts/ThemeContext';
-import { getSongById } from '../data/mockData';
+import { useSongs } from '../contexts/SongContext';
 import { RootStackScreenProps } from '../navigation/types';
 import { ChecklistItem } from '../data/types';
 import { usePractices } from '../contexts/PracticeContext';
@@ -25,6 +25,7 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
   const colors = useThemeColors();
   const { id } = route.params;
   const { practices, updatePractice, deletePractice } = usePractices();
+  const { songs: allSongs } = useSongs();
   const practice = practices.find((p) => p.id === id);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -397,7 +398,7 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>練習曲</Text>
         {practice.songs.map((practiceSong, index) => {
-          const song = getSongById(practiceSong.songId);
+          const song = allSongs.find((s) => s.id === practiceSong.songId);
           return (
             <TouchableOpacity
               key={practiceSong.songId}

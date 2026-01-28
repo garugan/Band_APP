@@ -14,7 +14,7 @@ import { ja } from 'date-fns/locale';
 
 import { Card } from '../components/Card';
 import { useThemeColors } from '../contexts/ThemeContext';
-import { getSongById } from '../data/mockData';
+import { useSongs } from '../contexts/SongContext';
 import { RootStackScreenProps } from '../navigation/types';
 import { ChecklistItem } from '../data/types';
 import { useLiveEvents } from '../contexts/LiveContext';
@@ -25,6 +25,7 @@ export function LiveDetailScreen({ route, navigation }: Props) {
   const colors = useThemeColors();
   const { id } = route.params;
   const { liveEvents, updateLiveEvent, deleteLiveEvent } = useLiveEvents();
+  const { songs: allSongs } = useSongs();
   const liveEvent = liveEvents.find((e) => e.id === id);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -408,7 +409,7 @@ export function LiveDetailScreen({ route, navigation }: Props) {
           </TouchableOpacity>
         </View>
         {liveEvent.setlist.map((setlistSong) => {
-          const song = getSongById(setlistSong.songId);
+          const song = allSongs.find((s) => s.id === setlistSong.songId);
           return (
             <TouchableOpacity
               key={setlistSong.songId + setlistSong.order}

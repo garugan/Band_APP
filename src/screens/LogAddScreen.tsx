@@ -17,7 +17,7 @@ import { ja } from 'date-fns/locale';
 
 import { Card } from '../components/Card';
 import { useThemeColors } from '../contexts/ThemeContext';
-import { mockSongs } from '../data/mockData';
+import { useSongs } from '../contexts/SongContext';
 import { LogSong } from '../data/types';
 import { RootStackScreenProps } from '../navigation/types';
 
@@ -25,6 +25,7 @@ type Props = RootStackScreenProps<'LogAdd'>;
 
 export function LogAddScreen({ route, navigation }: Props) {
   const colors = useThemeColors();
+  const { songs: allSongs } = useSongs();
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [songs, setSongs] = useState<LogSong[]>([]);
@@ -43,7 +44,7 @@ export function LogAddScreen({ route, navigation }: Props) {
 
   const handleAddSong = () => {
     const selectedIds = songs.map((s) => s.songId);
-    const availableSong = mockSongs.find((s) => !selectedIds.includes(s.id));
+    const availableSong = allSongs.find((s) => !selectedIds.includes(s.id));
     if (availableSong) {
       setSongs([...songs, { songId: availableSong.id, achievement: 50 }]);
     } else {
@@ -270,7 +271,7 @@ export function LogAddScreen({ route, navigation }: Props) {
             </Card>
           ) : (
             songs.map((logSong, index) => {
-              const song = mockSongs.find((s) => s.id === logSong.songId);
+              const song = allSongs.find((s) => s.id === logSong.songId);
               return (
                 <Card key={logSong.songId} style={styles.songCard}>
                   <View style={styles.songHeader}>

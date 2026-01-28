@@ -12,7 +12,7 @@ import { Feather } from '@expo/vector-icons';
 
 import { Card } from '../components/Card';
 import { useThemeColors } from '../contexts/ThemeContext';
-import { getSongById } from '../data/mockData';
+import { useSongs } from '../contexts/SongContext';
 import { SetlistSong } from '../data/types';
 import { RootStackScreenProps } from '../navigation/types';
 import { useLiveEvents } from '../contexts/LiveContext';
@@ -23,6 +23,7 @@ export function SetlistEditScreen({ route, navigation }: Props) {
   const colors = useThemeColors();
   const { id } = route.params;
   const { liveEvents, updateLiveEvent } = useLiveEvents();
+  const { songs: allSongs } = useSongs();
   const liveEvent = liveEvents.find((e) => e.id === id);
 
   const [setlist, setSetlist] = useState<SetlistSong[]>(
@@ -227,7 +228,7 @@ export function SetlistEditScreen({ route, navigation }: Props) {
     <View style={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {setlist.map((setlistSong, index) => {
-          const song = getSongById(setlistSong.songId);
+          const song = allSongs.find((s) => s.id === setlistSong.songId);
           return (
             <Card key={`${setlistSong.songId}-${index}`} style={styles.songCard}>
               <View style={styles.songHeader}>

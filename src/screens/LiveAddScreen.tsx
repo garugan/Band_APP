@@ -8,6 +8,8 @@ import {
   StyleSheet,
   Alert,
   Platform,
+  Modal,
+  FlatList,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -16,10 +18,10 @@ import { ja } from 'date-fns/locale';
 
 import { Card } from '../components/Card';
 import { useThemeColors } from '../contexts/ThemeContext';
-import { mockSongs, mockChecklistTemplates } from '../data/mockData';
+import { useSongs } from '../contexts/SongContext';
 import { RootStackScreenProps } from '../navigation/types';
 import { useLiveEvents } from '../contexts/LiveContext';
-import { LiveEvent, ChecklistItem, SetlistSong } from '../data/types';
+import { LiveEvent, SetlistSong, Song } from '../data/types';
 
 type Props = RootStackScreenProps<'LiveAdd'>;
 
@@ -31,6 +33,7 @@ interface SetlistItem {
 export function LiveAddScreen({ navigation }: Props) {
   const colors = useThemeColors();
   const { addLiveEvent } = useLiveEvents();
+  const { songs: allSongs } = useSongs();
 
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -40,9 +43,10 @@ export function LiveAddScreen({ navigation }: Props) {
   const [meetTime, setMeetTime] = useState('');
   const [setlist, setSetlist] = useState<SetlistItem[]>([]);
   const [memo, setMemo] = useState('');
-  const [useTemplate, setUseTemplate] = useState(true);
+  const [showSongPicker, setShowSongPicker] = useState(false);
 
-  const liveTemplate = mockChecklistTemplates.find((t) => t.type === 'live');
+  const selectedSongIds = setlist.map((s) => s.songId);
+  const availableSongs = allSongs.filter((s) => !selectedSongIds.includes(s.id));
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
     if (Platform.OS === 'android') {
@@ -70,22 +74,25 @@ export function LiveAddScreen({ navigation }: Props) {
   };
 
   const handleAddSong = () => {
-    const selectedIds = setlist.map((s) => s.songId);
-    const availableSong = mockSongs.find((s) => !selectedIds.includes(s.id));
-    if (availableSong) {
-      setSetlist([...setlist, { songId: availableSong.id, memo: '' }]);
-    } else {
+    if (availableSongs.length === 0) {
       Alert.alert('', 'すべての曲が追加されています');
+      return;
     }
+    setShowSongPicker(true);
+  };
+
+  const handleSelectSong = (songId: string) => {
+    setSetlist([...setlist, { songId, memo: '' }]);
+    setShowSongPicker(false);
   };
 
   const handleRemoveSong = (index: number) => {
     setSetlist(setlist.filter((_, i) => i !== index));
   };
 
-  const handleSongMemoChange = (index: number, memo: string) => {
+  const handleSongMemoChange = (index: number, memoText: string) => {
     const newSetlist = [...setlist];
-    newSetlist[index] = { ...newSetlist[index], memo };
+    newSetlist[index] = { ...newSetlist[index], memo: memoText };
     setSetlist(newSetlist);
   };
 
@@ -99,15 +106,6 @@ export function LiveAddScreen({ navigation }: Props) {
       return;
     }
 
-    let checklist: ChecklistItem[] = [];
-    if (useTemplate && liveTemplate) {
-      checklist = liveTemplate.items.map((item) => ({
-        ...item,
-        id: `${item.id}-${Date.now()}`,
-        checked: false,
-      }));
-    }
-
     const newLiveEvent: LiveEvent = {
       id: `l${Date.now()}`,
       title: title.trim(),
@@ -119,7 +117,7 @@ export function LiveAddScreen({ navigation }: Props) {
         order: index + 1,
         memo: s.memo || undefined,
       })),
-      checklist,
+      checklist: [],
       memo: memo.trim(),
       status: 'scheduled',
     };
@@ -245,44 +243,58 @@ export function LiveAddScreen({ navigation }: Props) {
       color: colors.primary,
       fontWeight: '500' as const,
     },
-    checkboxRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'flex-end',
     },
-    checkbox: {
-      width: 22,
-      height: 22,
-      borderRadius: 4,
-      borderWidth: 2,
-      borderColor: colors.border,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginRight: 12,
+    modalContent: {
+      backgroundColor: colors.card,
+      borderTopLeftRadius: 16,
+      borderTopRightRadius: 16,
+      maxHeight: '60%',
     },
-    checkboxChecked: {
-      backgroundColor: colors.primary,
-      borderColor: colors.primary,
-    },
-    checkboxLabel: {
-      fontSize: 14,
-      color: colors.text,
-    },
-    templatePreview: {
+    modalHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginTop: 12,
-      paddingTop: 12,
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
     },
-    templateName: {
-      fontSize: 14,
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    modalCloseButton: {
+      padding: 4,
+    },
+    songPickerItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    songPickerInfo: {
+      flex: 1,
+    },
+    songPickerTitle: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    songPickerMeta: {
+      fontSize: 13,
       color: colors.textSecondary,
+      marginTop: 2,
     },
-    templateCount: {
-      fontSize: 12,
+    emptyModalText: {
+      fontSize: 14,
       color: colors.textMuted,
+      textAlign: 'center',
+      padding: 32,
     },
     textarea: {
       fontSize: 15,
@@ -437,7 +449,7 @@ export function LiveAddScreen({ navigation }: Props) {
             </Card>
           ) : (
             setlist.map((item, index) => {
-              const song = mockSongs.find((s) => s.id === item.songId);
+              const song = allSongs.find((s) => s.id === item.songId);
               return (
                 <Card key={item.songId} style={styles.songCard}>
                   <View style={styles.songHeader}>
@@ -466,31 +478,6 @@ export function LiveAddScreen({ navigation }: Props) {
             <Text style={styles.addButtonText}>曲を追加</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Checklist Template */}
-        <Card style={styles.card}>
-          <View style={styles.checkboxRow}>
-            <TouchableOpacity
-              style={[styles.checkbox, useTemplate && styles.checkboxChecked]}
-              onPress={() => setUseTemplate(!useTemplate)}
-            >
-              {useTemplate && (
-                <Feather name="check" size={14} color="#ffffff" />
-              )}
-            </TouchableOpacity>
-            <Text style={styles.checkboxLabel}>
-              チェックリストテンプレートを使用
-            </Text>
-          </View>
-          {useTemplate && liveTemplate && (
-            <View style={styles.templatePreview}>
-              <Text style={styles.templateName}>{liveTemplate.name}</Text>
-              <Text style={styles.templateCount}>
-                {liveTemplate.items.length}項目
-              </Text>
-            </View>
-          )}
-        </Card>
 
         {/* Memo */}
         <Card style={styles.card}>
@@ -522,6 +509,50 @@ export function LiveAddScreen({ navigation }: Props) {
           <Text style={styles.saveButtonText}>保存</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Song Picker Modal */}
+      <Modal
+        visible={showSongPicker}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowSongPicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>曲を選択</Text>
+              <TouchableOpacity
+                style={styles.modalCloseButton}
+                onPress={() => setShowSongPicker(false)}
+              >
+                <Feather name="x" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+            {availableSongs.length === 0 ? (
+              <Text style={styles.emptyModalText}>追加できる曲がありません</Text>
+            ) : (
+              <FlatList
+                data={availableSongs}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }: { item: Song }) => (
+                  <TouchableOpacity
+                    style={styles.songPickerItem}
+                    onPress={() => handleSelectSong(item.id)}
+                  >
+                    <View style={styles.songPickerInfo}>
+                      <Text style={styles.songPickerTitle}>{item.title}</Text>
+                      <Text style={styles.songPickerMeta}>
+                        Key: {item.key} / BPM: {item.bpm}
+                      </Text>
+                    </View>
+                    <Feather name="plus" size={20} color={colors.primary} />
+                  </TouchableOpacity>
+                )}
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

@@ -16,7 +16,8 @@ import { Chip } from '../components/Chip';
 import { FAB } from '../components/FAB';
 import { EmptyState } from '../components/EmptyState';
 import { useThemeColors } from '../contexts/ThemeContext';
-import { mockPracticeLogs, getSongById } from '../data/mockData';
+import { useSongs } from '../contexts/SongContext';
+import { mockPracticeLogs } from '../data/mockData';
 import { PracticeLog } from '../data/types';
 import { MainTabScreenProps } from '../navigation/types';
 
@@ -26,6 +27,7 @@ type FilterType = 'this-month' | 'last-month' | 'all';
 
 export function PracticeLogsScreen({ navigation }: Props) {
   const colors = useThemeColors();
+  const { songs: allSongs } = useSongs();
   const [filter, setFilter] = useState<FilterType>('this-month');
 
   const calculateAverageAchievement = (log: PracticeLog): number => {
@@ -172,7 +174,7 @@ export function PracticeLogsScreen({ navigation }: Props) {
   const renderLog = ({ item }: { item: PracticeLog }) => {
     const avgAchievement = calculateAverageAchievement(item);
     const songNames = item.songs
-      .map((s) => getSongById(s.songId)?.title)
+      .map((s) => allSongs.find((song) => song.id === s.songId)?.title)
       .filter(Boolean);
 
     return (

@@ -269,7 +269,12 @@ export function SongDetailScreen({ route, navigation }: Props) {
   };
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={styles.container}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets
+    >
       {/* Basic Info */}
       <Card style={styles.card}>
         {isEditing ? (

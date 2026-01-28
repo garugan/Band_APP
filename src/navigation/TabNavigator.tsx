@@ -57,7 +57,7 @@ export function TabNavigator() {
         name="Schedule"
         component={ScheduleScreen}
         options={{
-          tabBarLabel: '予定',
+          tabBarLabel: 'スタジオ',
           tabBarIcon: ({ color, size }) => (
             <Feather name="calendar" size={size} color={color} />
           ),

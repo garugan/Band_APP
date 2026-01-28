@@ -144,7 +144,12 @@ export function SongAddScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets
+      >
         {/* Title */}
         <Card style={styles.card}>
           <Text style={styles.label}>曲名 *</Text>
