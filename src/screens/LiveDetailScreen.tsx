@@ -402,11 +402,13 @@ export function LiveDetailScreen({ route, navigation }: Props) {
       <View style={styles.section}>
         <View style={styles.sectionHeaderRow}>
           <Text style={styles.sectionLabel}>セットリスト</Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('SetlistEdit', { id: liveEvent.id })}
-          >
-            <Text style={styles.editLink}>編集</Text>
-          </TouchableOpacity>
+          {isEditing && (
+            <TouchableOpacity
+              onPress={() => navigation.navigate('SetlistEdit', { id: liveEvent.id })}
+            >
+              <Text style={styles.editLink}>編集</Text>
+            </TouchableOpacity>
+          )}
         </View>
         {liveEvent.setlist.map((setlistSong) => {
           const song = allSongs.find((s) => s.id === setlistSong.songId);

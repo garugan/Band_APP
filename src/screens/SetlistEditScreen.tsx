@@ -7,13 +7,15 @@ import {
   TextInput,
   StyleSheet,
   Alert,
+  Modal,
+  FlatList,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 
 import { Card } from '../components/Card';
 import { useThemeColors } from '../contexts/ThemeContext';
 import { useSongs } from '../contexts/SongContext';
-import { SetlistSong } from '../data/types';
+import { SetlistSong, Song } from '../data/types';
 import { RootStackScreenProps } from '../navigation/types';
 import { useLiveEvents } from '../contexts/LiveContext';
 
@@ -29,6 +31,10 @@ export function SetlistEditScreen({ route, navigation }: Props) {
   const [setlist, setSetlist] = useState<SetlistSong[]>(
     liveEvent?.setlist || []
   );
+  const [showSongPicker, setShowSongPicker] = useState(false);
+
+  const selectedSongIds = setlist.map((s) => s.songId);
+  const availableSongs = allSongs.filter((s) => !selectedSongIds.includes(s.id));
 
   const styles = useMemo(() => StyleSheet.create({
     container: {
@@ -116,6 +122,59 @@ export function SetlistEditScreen({ route, navigation }: Props) {
       fontSize: 16,
       color: colors.primary,
       fontWeight: '500' as const,
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'flex-end',
+    },
+    modalContent: {
+      backgroundColor: colors.card,
+      borderTopLeftRadius: 16,
+      borderTopRightRadius: 16,
+      maxHeight: '60%',
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    modalCloseButton: {
+      padding: 4,
+    },
+    songPickerItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    songPickerInfo: {
+      flex: 1,
+    },
+    songPickerTitle: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    songPickerMeta: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    emptyModalText: {
+      fontSize: 14,
+      color: colors.textMuted,
+      textAlign: 'center',
+      padding: 32,
     },
     bottomSpacer: {
       height: 100,
@@ -221,7 +280,19 @@ export function SetlistEditScreen({ route, navigation }: Props) {
   };
 
   const handleAddSong = () => {
-    Alert.alert('曲を追加', 'この機能は開発中です');
+    if (availableSongs.length === 0) {
+      Alert.alert('', 'すべての曲が追加されています');
+      return;
+    }
+    setShowSongPicker(true);
+  };
+
+  const handleSelectSong = (songId: string) => {
+    setSetlist([
+      ...setlist,
+      { songId, order: setlist.length + 1 },
+    ]);
+    setShowSongPicker(false);
   };
 
   return (
@@ -316,6 +387,50 @@ export function SetlistEditScreen({ route, navigation }: Props) {
           <Text style={styles.saveButtonText}>保存</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Song Picker Modal */}
+      <Modal
+        visible={showSongPicker}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowSongPicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>曲を選択</Text>
+              <TouchableOpacity
+                style={styles.modalCloseButton}
+                onPress={() => setShowSongPicker(false)}
+              >
+                <Feather name="x" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+            {availableSongs.length === 0 ? (
+              <Text style={styles.emptyModalText}>追加できる曲がありません</Text>
+            ) : (
+              <FlatList
+                data={availableSongs}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }: { item: Song }) => (
+                  <TouchableOpacity
+                    style={styles.songPickerItem}
+                    onPress={() => handleSelectSong(item.id)}
+                  >
+                    <View style={styles.songPickerInfo}>
+                      <Text style={styles.songPickerTitle}>{item.title}</Text>
+                      <Text style={styles.songPickerMeta}>
+                        Key: {item.key} / BPM: {item.bpm}
+                      </Text>
+                    </View>
+                    <Feather name="plus" size={20} color={colors.primary} />
+                  </TouchableOpacity>
+                )}
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

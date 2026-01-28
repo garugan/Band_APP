@@ -7,6 +7,8 @@ import {
   TextInput,
   StyleSheet,
   Alert,
+  Modal,
+  FlatList,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { format } from 'date-fns';
@@ -16,7 +18,7 @@ import { Card } from '../components/Card';
 import { useThemeColors } from '../contexts/ThemeContext';
 import { useSongs } from '../contexts/SongContext';
 import { RootStackScreenProps } from '../navigation/types';
-import { ChecklistItem } from '../data/types';
+import { ChecklistItem, PracticeSong, Song } from '../data/types';
 import { usePractices } from '../contexts/PracticeContext';
 
 type Props = RootStackScreenProps<'PracticeDetail'>;
@@ -33,9 +35,14 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
   const [editMeetTime, setEditMeetTime] = useState(practice?.meetTime || '');
   const [editPurpose, setEditPurpose] = useState(practice?.purpose || '');
   const [editMemo, setEditMemo] = useState(practice?.memo || '');
+  const [editSongs, setEditSongs] = useState<PracticeSong[]>(practice?.songs || []);
+  const [showSongPicker, setShowSongPicker] = useState(false);
   const [checklist, setChecklist] = useState<ChecklistItem[]>(
     practice?.checklist || []
   );
+
+  const selectedSongIds = editSongs.map((s) => s.songId);
+  const availableSongs = allSongs.filter((s) => !selectedSongIds.includes(s.id));
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -63,7 +70,7 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
         </View>
       ),
     });
-  }, [navigation, isEditing, editLocation, editMeetTime, editPurpose, editMemo, checklist, colors]);
+  }, [navigation, isEditing, editLocation, editMeetTime, editPurpose, editMemo, editSongs, checklist, colors]);
 
   const startEditing = () => {
     if (!practice) return;
@@ -71,6 +78,7 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
     setEditMeetTime(practice.meetTime || '');
     setEditPurpose(practice.purpose);
     setEditMemo(practice.memo);
+    setEditSongs([...practice.songs]);
     setIsEditing(true);
   };
 
@@ -94,9 +102,33 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
       meetTime: editMeetTime.trim() || undefined,
       purpose: editPurpose.trim(),
       memo: editMemo.trim(),
+      songs: editSongs.map((s, index) => ({ ...s, order: index + 1 })),
       checklist,
     });
     setIsEditing(false);
+  };
+
+  const handleAddSong = () => {
+    if (availableSongs.length === 0) {
+      Alert.alert('', 'すべての曲が追加されています');
+      return;
+    }
+    setShowSongPicker(true);
+  };
+
+  const handleSelectSong = (songId: string) => {
+    setEditSongs([...editSongs, { songId, order: editSongs.length + 1, goal: '' }]);
+    setShowSongPicker(false);
+  };
+
+  const handleRemoveSong = (index: number) => {
+    setEditSongs(editSongs.filter((_, i) => i !== index));
+  };
+
+  const handleSongGoalChange = (index: number, goal: string) => {
+    const newSongs = [...editSongs];
+    newSongs[index] = { ...newSongs[index], goal };
+    setEditSongs(newSongs);
   };
 
   const handleDelete = () => {
@@ -301,6 +333,98 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
       fontWeight: '600' as const,
       color: '#ffffff',
     },
+    addButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 12,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      borderStyle: 'dashed',
+      borderRadius: 12,
+      gap: 8,
+      marginTop: 8,
+    },
+    addButtonText: {
+      fontSize: 14,
+      color: colors.primary,
+      fontWeight: '500' as const,
+    },
+    editSongCard: {
+      marginBottom: 8,
+    },
+    editSongHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    editSongTitle: {
+      flex: 1,
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    goalInput: {
+      marginTop: 12,
+      paddingTop: 12,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      fontSize: 14,
+      color: colors.text,
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'flex-end',
+    },
+    modalContent: {
+      backgroundColor: colors.card,
+      borderTopLeftRadius: 16,
+      borderTopRightRadius: 16,
+      maxHeight: '60%',
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    modalCloseButton: {
+      padding: 4,
+    },
+    songPickerItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    songPickerInfo: {
+      flex: 1,
+    },
+    songPickerTitle: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    songPickerMeta: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    emptyModalText: {
+      fontSize: 14,
+      color: colors.textMuted,
+      textAlign: 'center',
+      padding: 32,
+    },
     bottomSpacer: {
       height: 40,
     },
@@ -323,6 +447,7 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
   };
 
   return (
+    <>
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Basic Info */}
       <Card style={styles.card}>
@@ -397,42 +522,74 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
       {/* Songs */}
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>練習曲</Text>
-        {practice.songs.map((practiceSong, index) => {
-          const song = allSongs.find((s) => s.id === practiceSong.songId);
-          return (
-            <TouchableOpacity
-              key={practiceSong.songId}
-              onPress={() =>
-                navigation.navigate('SongDetail', { id: practiceSong.songId })
-              }
-            >
-              <Card style={styles.songCard}>
-                <View style={styles.songHeader}>
-                  <View style={styles.orderBadge}>
-                    <Text style={styles.orderText}>{practiceSong.order}</Text>
+        {isEditing ? (
+          <>
+            {editSongs.map((practiceSong, index) => {
+              const song = allSongs.find((s) => s.id === practiceSong.songId);
+              return (
+                <Card key={practiceSong.songId} style={styles.editSongCard}>
+                  <View style={styles.editSongHeader}>
+                    <View style={styles.orderBadge}>
+                      <Text style={styles.orderText}>{index + 1}</Text>
+                    </View>
+                    <Text style={styles.editSongTitle}>{song?.title || '不明'}</Text>
+                    <TouchableOpacity onPress={() => handleRemoveSong(index)}>
+                      <Feather name="x" size={20} color={colors.error} />
+                    </TouchableOpacity>
                   </View>
-                  <View style={styles.songInfo}>
-                    <Text style={styles.songTitle}>{song?.title || '不明'}</Text>
-                    <Text style={styles.songMeta}>
-                      Key: {song?.key} / BPM: {song?.bpm}
-                    </Text>
-                  </View>
-                  <Feather
-                    name="chevron-right"
-                    size={20}
-                    color={colors.textMuted}
+                  <TextInput
+                    style={styles.goalInput}
+                    placeholder="練習目標（任意）"
+                    placeholderTextColor={colors.textMuted}
+                    value={practiceSong.goal}
+                    onChangeText={(text) => handleSongGoalChange(index, text)}
                   />
-                </View>
-                {practiceSong.goal && (
-                  <View style={styles.goalContainer}>
-                    <Text style={styles.goalLabel}>目標:</Text>
-                    <Text style={styles.goalText}>{practiceSong.goal}</Text>
-                  </View>
-                )}
-              </Card>
+                </Card>
+              );
+            })}
+            <TouchableOpacity style={styles.addButton} onPress={handleAddSong}>
+              <Feather name="plus" size={18} color={colors.primary} />
+              <Text style={styles.addButtonText}>曲を追加</Text>
             </TouchableOpacity>
-          );
-        })}
+          </>
+        ) : (
+          practice.songs.map((practiceSong) => {
+            const song = allSongs.find((s) => s.id === practiceSong.songId);
+            return (
+              <TouchableOpacity
+                key={practiceSong.songId}
+                onPress={() =>
+                  navigation.navigate('SongDetail', { id: practiceSong.songId })
+                }
+              >
+                <Card style={styles.songCard}>
+                  <View style={styles.songHeader}>
+                    <View style={styles.orderBadge}>
+                      <Text style={styles.orderText}>{practiceSong.order}</Text>
+                    </View>
+                    <View style={styles.songInfo}>
+                      <Text style={styles.songTitle}>{song?.title || '不明'}</Text>
+                      <Text style={styles.songMeta}>
+                        Key: {song?.key} / BPM: {song?.bpm}
+                      </Text>
+                    </View>
+                    <Feather
+                      name="chevron-right"
+                      size={20}
+                      color={colors.textMuted}
+                    />
+                  </View>
+                  {practiceSong.goal && (
+                    <View style={styles.goalContainer}>
+                      <Text style={styles.goalLabel}>目標:</Text>
+                      <Text style={styles.goalText}>{practiceSong.goal}</Text>
+                    </View>
+                  )}
+                </Card>
+              </TouchableOpacity>
+            );
+          })
+        )}
       </View>
 
       {/* Checklist */}
@@ -514,5 +671,50 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
 
       <View style={styles.bottomSpacer} />
     </ScrollView>
+
+    {/* Song Picker Modal */}
+    <Modal
+      visible={showSongPicker}
+      transparent
+      animationType="slide"
+      onRequestClose={() => setShowSongPicker(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>曲を選択</Text>
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => setShowSongPicker(false)}
+            >
+              <Feather name="x" size={24} color={colors.text} />
+            </TouchableOpacity>
+          </View>
+          {availableSongs.length === 0 ? (
+            <Text style={styles.emptyModalText}>追加できる曲がありません</Text>
+          ) : (
+            <FlatList
+              data={availableSongs}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }: { item: Song }) => (
+                <TouchableOpacity
+                  style={styles.songPickerItem}
+                  onPress={() => handleSelectSong(item.id)}
+                >
+                  <View style={styles.songPickerInfo}>
+                    <Text style={styles.songPickerTitle}>{item.title}</Text>
+                    <Text style={styles.songPickerMeta}>
+                      Key: {item.key} / BPM: {item.bpm}
+                    </Text>
+                  </View>
+                  <Feather name="plus" size={20} color={colors.primary} />
+                </TouchableOpacity>
+              )}
+            />
+          )}
+        </View>
+      </View>
+    </Modal>
+    </>
   );
 }
