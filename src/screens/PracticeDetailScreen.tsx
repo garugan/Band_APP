@@ -92,10 +92,6 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
       Alert.alert('エラー', '場所を入力してください');
       return;
     }
-    if (!editPurpose.trim()) {
-      Alert.alert('エラー', '目的を入力してください');
-      return;
-    }
     updatePractice(id, {
       ...practice,
       location: editLocation.trim(),

@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
 import { Card } from '../components/Card';
+import { Chip } from '../components/Chip';
 import { useThemeColors } from '../contexts/ThemeContext';
 import { useSongs } from '../contexts/SongContext';
 import { usePractices } from '../contexts/PracticeContext';
@@ -38,6 +39,8 @@ export function LogAddScreen({ route, navigation }: Props) {
   const [songs, setSongs] = useState<LogSong[]>(
     practice?.songs.map((s) => ({ songId: s.songId, achievement: 50 })) || []
   );
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
   const [goodPoints, setGoodPoints] = useState('');
   const [issues, setIssues] = useState('');
   const [nextActions, setNextActions] = useState('');
@@ -71,6 +74,25 @@ export function LogAddScreen({ route, navigation }: Props) {
     setSongs(newSongs);
   };
 
+  const handleAddTag = () => {
+    const trimmed = tagInput.trim();
+    if (!trimmed) return;
+    if (tags.length >= 3) {
+      Alert.alert('', 'タグは最大3つまでです');
+      return;
+    }
+    if (tags.includes(trimmed)) {
+      Alert.alert('', '同じタグが既に追加されています');
+      return;
+    }
+    setTags([...tags, trimmed]);
+    setTagInput('');
+  };
+
+  const handleRemoveTag = (index: number) => {
+    setTags(tags.filter((_, i) => i !== index));
+  };
+
   const handleSave = () => {
     if (songs.length === 0) {
       Alert.alert('エラー', '少なくとも1曲を追加してください');
@@ -82,6 +104,7 @@ export function LogAddScreen({ route, navigation }: Props) {
       date,
       relatedPracticeId: practiceId,
       songs,
+      tags: tags.length > 0 ? tags : undefined,
       goodPoints: goodPoints.trim(),
       issues: issues.trim(),
       nextActions: nextActions.trim(),
@@ -199,6 +222,49 @@ export function LogAddScreen({ route, navigation }: Props) {
       fontSize: 16,
       color: colors.primary,
       fontWeight: '500' as const,
+    },
+    tagInputRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    tagInput: {
+      flex: 1,
+      fontSize: 15,
+      color: colors.text,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 8,
+    },
+    tagAddButton: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 8,
+      backgroundColor: colors.primary,
+    },
+    tagAddButtonDisabled: {
+      backgroundColor: colors.muted,
+    },
+    tagAddButtonText: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      color: '#ffffff',
+    },
+    tagAddButtonTextDisabled: {
+      color: colors.textMuted,
+    },
+    tagsContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+      marginTop: 8,
+    },
+    tagCount: {
+      fontSize: 12,
+      color: colors.textMuted,
+      marginTop: 4,
     },
     textarea: {
       fontSize: 15,
@@ -328,6 +394,56 @@ export function LogAddScreen({ route, navigation }: Props) {
             <Text style={styles.addButtonText}>曲を追加</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Tags */}
+        <Card style={styles.card}>
+          <View style={styles.labelRow}>
+            <Feather name="tag" size={18} color={colors.primary} />
+            <Text style={styles.label}>タグ</Text>
+          </View>
+          <View style={styles.tagInputRow}>
+            <TextInput
+              style={styles.tagInput}
+              placeholder="タグを入力..."
+              placeholderTextColor={colors.textMuted}
+              value={tagInput}
+              onChangeText={setTagInput}
+              onSubmitEditing={handleAddTag}
+              returnKeyType="done"
+              editable={tags.length < 3}
+            />
+            <TouchableOpacity
+              style={[
+                styles.tagAddButton,
+                (tags.length >= 3 || !tagInput.trim()) && styles.tagAddButtonDisabled,
+              ]}
+              onPress={handleAddTag}
+              disabled={tags.length >= 3 || !tagInput.trim()}
+            >
+              <Text
+                style={[
+                  styles.tagAddButtonText,
+                  (tags.length >= 3 || !tagInput.trim()) && styles.tagAddButtonTextDisabled,
+                ]}
+              >
+                追加
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {tags.length > 0 && (
+            <View style={styles.tagsContainer}>
+              {tags.map((tag, index) => (
+                <Chip
+                  key={index}
+                  label={tag}
+                  variant="primary"
+                  onRemove={() => handleRemoveTag(index)}
+                />
+              ))}
+            </View>
+          )}
+          <Text style={styles.tagCount}>{tags.length} / 3</Text>
+        </Card>
 
         {/* Good Points */}
         <Card style={styles.card}>

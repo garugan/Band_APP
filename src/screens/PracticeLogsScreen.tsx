@@ -211,6 +211,14 @@ export function PracticeLogsScreen({ navigation }: Props) {
             )}
           </View>
 
+          {item.tags && item.tags.length > 0 && (
+            <View style={[styles.tagsContainer, { marginTop: 4 }]}>
+              {item.tags.map((tag, index) => (
+                <Chip key={`tag-${index}`} label={tag} variant="primary" />
+              ))}
+            </View>
+          )}
+
           {item.issues && (
             <Text style={styles.issuesText} numberOfLines={2}>
               {item.issues}

@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
 import { Card } from '../components/Card';
+import { Chip } from '../components/Chip';
 import { useThemeColors } from '../contexts/ThemeContext';
 import { useSongs } from '../contexts/SongContext';
 import { useLogs } from '../contexts/LogContext';
@@ -131,6 +132,11 @@ export function LogDetailScreen({ route, navigation }: Props) {
       borderLeftWidth: 3,
       borderLeftColor: colors.error,
     },
+    tagsContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
     bottomSpacer: {
       height: 40,
     },
@@ -155,6 +161,23 @@ export function LogDetailScreen({ route, navigation }: Props) {
           </Text>
         </View>
       </Card>
+
+      {/* Tags */}
+      {log.tags && log.tags.length > 0 && (
+        <Card style={styles.card}>
+          <View style={styles.sectionHeader}>
+            <Feather name="tag" size={18} color={colors.primary} />
+            <Text style={[styles.sectionTitle, { color: colors.primary }]}>
+              タグ
+            </Text>
+          </View>
+          <View style={styles.tagsContainer}>
+            {log.tags.map((tag, index) => (
+              <Chip key={index} label={tag} variant="primary" />
+            ))}
+          </View>
+        </Card>
+      )}
 
       {/* Songs Achievement */}
       <View style={styles.section}>

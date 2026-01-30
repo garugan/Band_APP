@@ -63,6 +63,7 @@ export interface PracticeLog {
   relatedPracticeId?: string;
   relatedLiveId?: string;
   songs: LogSong[];
+  tags?: string[];
   goodPoints: string;
   issues: string;
   nextActions: string;

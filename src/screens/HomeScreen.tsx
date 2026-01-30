@@ -134,6 +134,11 @@ export function HomeScreen({ navigation }: Props) {
       color: colors.textSecondary,
       marginLeft: 8,
     },
+    emptyText: {
+      fontSize: 14,
+      color: colors.textMuted,
+      marginTop: 4,
+    },
     sectionTitle: {
       fontSize: 16,
       fontWeight: '600' as const,
@@ -203,7 +208,7 @@ export function HomeScreen({ navigation }: Props) {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Next Practice */}
-        {nextPractice && (
+        {nextPractice ? (
           <TouchableOpacity
             onPress={() =>
               navigation.navigate('PracticeDetail', { id: nextPractice.id })
@@ -250,10 +255,22 @@ export function HomeScreen({ navigation }: Props) {
               </View>
             </Card>
           </TouchableOpacity>
+        ) : (
+          <Card style={styles.card}>
+            <View style={styles.cardHeader}>
+              <View style={styles.iconContainer}>
+                <Feather name="calendar" size={20} color={colors.textMuted} />
+              </View>
+              <View style={styles.cardContent}>
+                <Text style={styles.cardTitle}>次のスタジオ練習</Text>
+                <Text style={styles.emptyText}>予定されている練習はありません</Text>
+              </View>
+            </View>
+          </Card>
         )}
 
         {/* Next Live */}
-        {nextLive && (
+        {nextLive ? (
           <TouchableOpacity
             onPress={() =>
               navigation.navigate('LiveDetail', { id: nextLive.id })
@@ -298,6 +315,18 @@ export function HomeScreen({ navigation }: Props) {
               </View>
             </Card>
           </TouchableOpacity>
+        ) : (
+          <Card style={styles.card}>
+            <View style={styles.cardHeader}>
+              <View style={styles.iconContainer}>
+                <Feather name="mic" size={20} color={colors.textMuted} />
+              </View>
+              <View style={styles.cardContent}>
+                <Text style={styles.cardTitle}>次のライブ</Text>
+                <Text style={styles.emptyText}>予定されているライブはありません</Text>
+              </View>
+            </View>
+          </Card>
         )}
 
         {/* Quick Actions */}
