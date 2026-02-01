@@ -8,6 +8,8 @@ import {
   StyleSheet,
   Alert,
   Platform,
+  Modal,
+  FlatList,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
@@ -21,7 +23,7 @@ import { useThemeColors } from '../contexts/ThemeContext';
 import { useSongs } from '../contexts/SongContext';
 import { usePractices } from '../contexts/PracticeContext';
 import { useLogs } from '../contexts/LogContext';
-import { LogSong } from '../data/types';
+import { LogSong, Song } from '../data/types';
 import { RootStackScreenProps } from '../navigation/types';
 
 type Props = RootStackScreenProps<'LogAdd'>;
@@ -42,6 +44,7 @@ export function LogAddScreen({ route, navigation }: Props) {
   );
   const [tags, setTags] = useState<string[]>(initialTags || []);
   const [tagInput, setTagInput] = useState('');
+  const [showSongPicker, setShowSongPicker] = useState(false);
   const [goodPoints, setGoodPoints] = useState('');
   const [issues, setIssues] = useState('');
   const [nextActions, setNextActions] = useState('');
@@ -55,14 +58,20 @@ export function LogAddScreen({ route, navigation }: Props) {
     }
   };
 
+  const selectedSongIds = songs.map((s) => s.songId);
+  const availableSongs = allSongs.filter((s) => !selectedSongIds.includes(s.id));
+
   const handleAddSong = () => {
-    const selectedIds = songs.map((s) => s.songId);
-    const availableSong = allSongs.find((s) => !selectedIds.includes(s.id));
-    if (availableSong) {
-      setSongs([...songs, { songId: availableSong.id, achievement: 50 }]);
-    } else {
+    if (availableSongs.length === 0) {
       Alert.alert('', 'すべての曲が追加されています');
+      return;
     }
+    setShowSongPicker(true);
+  };
+
+  const handleSelectSong = (songId: string) => {
+    setSongs([...songs, { songId, achievement: 50 }]);
+    setShowSongPicker(false);
   };
 
   const handleRemoveSong = (index: number) => {
@@ -276,6 +285,59 @@ export function LogAddScreen({ route, navigation }: Props) {
     bottomSpacer: {
       height: 100,
     },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'flex-end',
+    },
+    modalContent: {
+      backgroundColor: colors.card,
+      borderTopLeftRadius: 16,
+      borderTopRightRadius: 16,
+      maxHeight: '60%',
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    modalCloseButton: {
+      padding: 4,
+    },
+    songPickerItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    songPickerInfo: {
+      flex: 1,
+    },
+    songPickerTitle: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    songPickerMeta: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    emptyModalText: {
+      fontSize: 14,
+      color: colors.textMuted,
+      textAlign: 'center',
+      padding: 32,
+    },
     footer: {
       flexDirection: 'row',
       padding: 16,
@@ -312,6 +374,7 @@ export function LogAddScreen({ route, navigation }: Props) {
   }), [colors]);
 
   return (
+    <>
     <View style={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Date */}
@@ -522,5 +585,50 @@ export function LogAddScreen({ route, navigation }: Props) {
         </TouchableOpacity>
       </View>
     </View>
+
+    {/* Song Picker Modal */}
+    <Modal
+      visible={showSongPicker}
+      transparent
+      animationType="slide"
+      onRequestClose={() => setShowSongPicker(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>曲を選択</Text>
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => setShowSongPicker(false)}
+            >
+              <Feather name="x" size={24} color={colors.text} />
+            </TouchableOpacity>
+          </View>
+          {availableSongs.length === 0 ? (
+            <Text style={styles.emptyModalText}>追加できる曲がありません</Text>
+          ) : (
+            <FlatList
+              data={availableSongs}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }: { item: Song }) => (
+                <TouchableOpacity
+                  style={styles.songPickerItem}
+                  onPress={() => handleSelectSong(item.id)}
+                >
+                  <View style={styles.songPickerInfo}>
+                    <Text style={styles.songPickerTitle}>{item.title}</Text>
+                    <Text style={styles.songPickerMeta}>
+                      Key: {item.key} / BPM: {item.bpm}
+                    </Text>
+                  </View>
+                  <Feather name="plus" size={20} color={colors.primary} />
+                </TouchableOpacity>
+              )}
+            />
+          )}
+        </View>
+      </View>
+    </Modal>
+    </>
   );
 }
