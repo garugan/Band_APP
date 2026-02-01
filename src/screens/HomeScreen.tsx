@@ -15,7 +15,7 @@ import { ja } from 'date-fns/locale';
 import { Card } from '../components/Card';
 import { FAB } from '../components/FAB';
 import { useTheme } from '../contexts/ThemeContext';
-import { bandInfo } from '../data/mockData';
+import { useProfile } from '../contexts/ProfileContext';
 import { MainTabScreenProps } from '../navigation/types';
 import { usePractices } from '../contexts/PracticeContext';
 import { useLiveEvents } from '../contexts/LiveContext';
@@ -26,6 +26,7 @@ export function HomeScreen({ navigation }: Props) {
   const { practices } = usePractices();
   const { liveEvents } = useLiveEvents();
   const { isDark, toggleTheme, colors } = useTheme();
+  const { profile } = useProfile();
 
   const now = new Date();
 
@@ -188,11 +189,22 @@ export function HomeScreen({ navigation }: Props) {
             />
           </TouchableOpacity>
         </View>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {bandInfo.memberName.charAt(0)}
-          </Text>
-        </View>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Profile')}
+        >
+          {profile.avatarUri ? (
+            <Image
+              source={{ uri: profile.avatarUri }}
+              style={styles.avatar}
+            />
+          ) : (
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>
+                {profile.name ? profile.name.charAt(0) : '?'}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
         <View pointerEvents="none" style={styles.headerIconWrapper}>
           <Image
             source={

@@ -14,6 +14,7 @@ export type RootStackParamList = {
   ChecklistTemplates: undefined;
   LogDetail: { id: string };
   LogAdd: { practiceId?: string; liveId?: string; initialTags?: string[] } | undefined;
+  Profile: undefined;
 };
 
 export type MainTabParamList = {

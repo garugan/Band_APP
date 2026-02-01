@@ -74,4 +74,11 @@ export interface LogSong {
   achievement: number;
 }
 
+export interface Profile {
+  name: string;
+  part: string;
+  bandName: string;
+  avatarUri?: string;
+}
+
 export type TabType = 'home' | 'songs' | 'schedule' | 'live' | 'log';

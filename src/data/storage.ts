@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { Song, Practice, LiveEvent, PracticeLog, ChecklistTemplate } from './types';
+import type { Song, Practice, LiveEvent, PracticeLog, ChecklistTemplate, Profile } from './types';
 
 const KEYS = {
   SONGS: 'songs',
@@ -7,6 +7,7 @@ const KEYS = {
   LIVE_EVENTS: 'liveEvents',
   PRACTICE_LOGS: 'practiceLogs',
   CHECKLIST_TEMPLATES: 'checklistTemplates',
+  PROFILE: 'profile',
 } as const;
 
 // --- 汎用ヘルパー ---
@@ -55,6 +56,12 @@ export const ChecklistTemplateStorage = {
   getAll: () => getItem<ChecklistTemplate[]>(KEYS.CHECKLIST_TEMPLATES).then((v) => v ?? []),
   saveAll: (templates: ChecklistTemplate[]) => setItem(KEYS.CHECKLIST_TEMPLATES, templates),
   clear: () => removeItem(KEYS.CHECKLIST_TEMPLATES),
+};
+
+export const ProfileStorage = {
+  get: () => getItem<Profile>(KEYS.PROFILE),
+  save: (profile: Profile) => setItem(KEYS.PROFILE, profile),
+  clear: () => removeItem(KEYS.PROFILE),
 };
 
 export { KEYS };

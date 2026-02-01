@@ -8,6 +8,7 @@ import { LiveProvider } from './src/contexts/LiveContext';
 import { SongProvider } from './src/contexts/SongContext';
 import { LogProvider } from './src/contexts/LogContext';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
+import { ProfileProvider } from './src/contexts/ProfileContext';
 
 function AppContent() {
   const { isDark, colors } = useTheme();
@@ -48,15 +49,17 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <SongProvider>
-          <PracticeProvider>
-            <LiveProvider>
-              <LogProvider>
-                <AppContent />
-              </LogProvider>
-            </LiveProvider>
-          </PracticeProvider>
-        </SongProvider>
+        <ProfileProvider>
+          <SongProvider>
+            <PracticeProvider>
+              <LiveProvider>
+                <LogProvider>
+                  <AppContent />
+                </LogProvider>
+              </LiveProvider>
+            </PracticeProvider>
+          </SongProvider>
+        </ProfileProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );
