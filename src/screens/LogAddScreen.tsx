@@ -32,6 +32,7 @@ export function LogAddScreen({ route, navigation }: Props) {
   const { practices } = usePractices();
   const { addLog } = useLogs();
   const practiceId = route.params?.practiceId;
+  const initialTags = route.params?.initialTags;
   const practice = practiceId ? practices.find((p) => p.id === practiceId) : undefined;
 
   const [date, setDate] = useState(practice?.date ? new Date(practice.date) : new Date());
@@ -39,7 +40,7 @@ export function LogAddScreen({ route, navigation }: Props) {
   const [songs, setSongs] = useState<LogSong[]>(
     practice?.songs.map((s) => ({ songId: s.songId, achievement: 50 })) || []
   );
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>(initialTags || []);
   const [tagInput, setTagInput] = useState('');
   const [goodPoints, setGoodPoints] = useState('');
   const [issues, setIssues] = useState('');

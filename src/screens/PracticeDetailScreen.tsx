@@ -657,7 +657,7 @@ export function PracticeDetailScreen({ route, navigation }: Props) {
         <TouchableOpacity
           style={styles.actionButton}
           onPress={() =>
-            navigation.navigate('LogAdd', { practiceId: practice.id })
+            navigation.navigate('LogAdd', { practiceId: practice.id, initialTags: ['スタジオ練習'] })
           }
         >
           <Feather name="file-text" size={20} color="#ffffff" />

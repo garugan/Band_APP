@@ -13,7 +13,7 @@ export type RootStackParamList = {
   SetlistEdit: { id: string };
   ChecklistTemplates: undefined;
   LogDetail: { id: string };
-  LogAdd: { practiceId?: string; liveId?: string } | undefined;
+  LogAdd: { practiceId?: string; liveId?: string; initialTags?: string[] } | undefined;
 };
 
 export type MainTabParamList = {
